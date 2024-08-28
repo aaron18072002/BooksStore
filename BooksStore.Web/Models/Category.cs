@@ -7,9 +7,11 @@ namespace BooksStore.Web.Models
         [Key]
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Category name is required")]
-        [MaxLength(40, ErrorMessage = "Category name must be less than 40 characters")]
+        [Required()]
+        [MaxLength(40)]
         public string? Name { get; set; }
+
+        [Range(1, 100)]
         public int DisplayOrder { get; set; }
     }
 }

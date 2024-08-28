@@ -7,6 +7,9 @@ namespace BooksStore.Web.Models.DTOs
         [Required(ErrorMessage = "Category name is required")]
         [MaxLength(40, ErrorMessage = "Category name must be less than 40 characters")]
         public string? Name { get; set; }
+
+        [Required(ErrorMessage = "Display Order is required")]
+        [Range(1, 100, ErrorMessage = "Display Order must be between 1 and 100")]
         public int DisplayOrder { get; set; }
         public Category ToCategory()
         {
