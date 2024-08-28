@@ -1,4 +1,5 @@
 ﻿using BooksStore.Web.Database;
+using BooksStore.Web.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,6 +35,25 @@ namespace BooksStore.Web.Controllers
                 nameof(CategoryController), nameof(this.Create));
 
             return View();
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Create
+            ([FromForm]CategoryAddRequest categoryAddRequest)
+        {
+            if(categoryAddRequest == null)
+            {
+                throw new ArgumentNullException(nameof(categoryAddRequest));
+            }
+
+            var category = categoryAddRequest.ToCategory();
+            //category.Id = categoryAddRequest.DisplayOrder;
+
+            this._db.Categories.Add(category);
+            await this._db.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Category");
         }
     }
 }
