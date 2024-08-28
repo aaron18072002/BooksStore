@@ -1,5 +1,6 @@
 using BooksStore.Web.Database;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace BooksStore.Web
 {
@@ -15,6 +16,25 @@ namespace BooksStore.Web
             builder.Services.AddDbContext<BooksStoreDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            });
+
+            builder.Services.AddHttpLogging(logging =>
+            {
+                logging.LoggingFields = Microsoft.AspNetCore.HttpLogging.HttpLoggingFields.All;
+                logging.RequestHeaders.Add("sec-ch-ua");
+                logging.ResponseHeaders.Add("MyResponseHeader");
+                logging.MediaTypeOptions.AddText("application/javascript");
+                logging.RequestBodyLogLimit = 4096;
+                logging.ResponseBodyLogLimit = 4096;
+                logging.CombineLogs = true;
+            });
+
+            // Serilog
+            builder.Host.UseSerilog((context, services, loggerConfiguration) =>
+            {
+                loggerConfiguration
+                    .ReadFrom.Configuration(context.Configuration)
+                    .ReadFrom.Services(services); //read out current app's services and make them available to serilog
             });
 
             var app = builder.Build();
