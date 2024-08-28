@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using BooksStore.Web.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace BooksStore.Web.Database
 {
@@ -8,5 +9,6 @@ namespace BooksStore.Web.Database
         {
 
         }
+        public DbSet<Category> Categories { get; set; }
     }
 }
