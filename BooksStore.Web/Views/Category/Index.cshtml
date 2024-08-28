@@ -1,18 +1,31 @@
 ﻿@model IEnumerable<Category>
 
-<h1>Categories list</h1>
+<div class="container">
+    <div class="row pt-4 pb-3">
+        <div class="col-6">
+            <h2 class="text-primary">
+                Categories list
+            </h2>
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Create new category
+            </a>
+        </div>
+    </div>
+</div>
 
 <table class="table table-bordered table-striped">
     <thead>
-        <th>
-            Category Name
-        </th>
-        <th>
-            Display Order
-        </th>
+    <th>
+        Category Name
+    </th>
+    <th>
+        Display Order
+    </th>
     </thead>
     <tbody>
-        @foreach(var category in Model.OrderBy(c => c.DisplayOrder))
+        @foreach (var category in Model.OrderBy(c => c.DisplayOrder))
         {
             <tr>
                 <td>@category.Name</td>
