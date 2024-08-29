@@ -52,6 +52,17 @@ namespace BooksStore.Web.Controllers
                 throw new ArgumentNullException(nameof(categoryAddRequest));
             }
 
+            if(categoryAddRequest.Name == null)
+            {
+                throw new ArgumentException(nameof(categoryAddRequest));
+            }
+
+            if(categoryAddRequest.Name.ToLower() == categoryAddRequest.DisplayOrder.ToString())
+            {
+                this.ModelState.AddModelError
+                    (nameof(categoryAddRequest.Name), "Category name and display order can not be same");
+            }
+
             if(this.ModelState.IsValid)
             {
                 var category = categoryAddRequest.ToCategory();
