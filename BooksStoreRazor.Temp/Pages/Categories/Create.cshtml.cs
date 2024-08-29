@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace BooksStoreRazor.Temp.Pages.Categories
 {
+    [BindProperties]
     public class CreateModel : PageModel
     {
         private readonly BooksStoreRazorDbContext _db;
@@ -16,6 +17,14 @@ namespace BooksStoreRazor.Temp.Pages.Categories
         }
         public void OnGet()
         {
+        }
+
+        public async Task<IActionResult> OnPost()
+        {
+            this._db.Categories.Add(this.Category);
+            await this._db.SaveChangesAsync();
+
+            return this.RedirectToAction("Index", "Categories");
         }
     }
 }
