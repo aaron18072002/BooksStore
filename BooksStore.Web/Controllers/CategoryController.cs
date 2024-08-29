@@ -24,9 +24,9 @@ namespace BooksStore.Web.Controllers
                 nameof(CategoryController), nameof(this.Index));
             var categories = await this._db.Categories.ToListAsync();
 
-            var categoriesResponse = categories.Select(c => c.ToCategoryResponse());
+            var categoriesResponse = categories.Select(c => c.ToCategoryResponse()).ToList();
 
-            return View(categoriesResponse);
+            return this.View(categoriesResponse);
         }
 
         [HttpGet]
@@ -36,7 +36,7 @@ namespace BooksStore.Web.Controllers
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Create));
 
-            return View();
+            return this.View();
         }
 
         [HttpPost]
@@ -70,10 +70,10 @@ namespace BooksStore.Web.Controllers
                 this._db.Categories.Add(category);
                 await this._db.SaveChangesAsync();
 
-                return RedirectToAction("Index", "Category");
+                return this.RedirectToAction("Index", "Category");
             }
 
-            return View();
+            return this.View();
         }
 
         [HttpGet]
@@ -85,18 +85,18 @@ namespace BooksStore.Web.Controllers
 
             if(categoryId == null)
             {
-                return NotFound();
+                return this.NotFound();
             }
 
             var category = await this._db.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
             if (category == null) 
             {
-                return NotFound();
+                return this.NotFound();
             }
 
             var categoryUpdateRequest = category.ToCategoryUpdateRequest();
 
-            return View(categoryUpdateRequest);
+            return this.View(categoryUpdateRequest);
         }
 
         [HttpPost]
@@ -108,14 +108,62 @@ namespace BooksStore.Web.Controllers
 
             if(!this.ModelState.IsValid)
             {
-                return View(categoryUpdateRequest);
+                return this.View(categoryUpdateRequest);
             }
 
             var category = categoryUpdateRequest.ToCategory();
             this._db.Categories.Update(category);
             await this._db.SaveChangesAsync();
 
-            return RedirectToAction("Index", "Category");
+            return this.RedirectToAction("Index", "Category");
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Delete([FromQuery]int? categoryId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
+                nameof(CategoryController), nameof(this.Delete));
+
+            if (categoryId == null)
+            {
+                return this.NotFound();
+            };
+
+            var category = await this._db.Categories.FirstOrDefaultAsync
+                (c => c.Id == categoryId);
+            if(category == null)
+            {
+                return this.NotFound();
+            }
+
+            var categoryResponse = category.ToCategoryResponse();
+
+            return this.View(categoryResponse);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> DeletePOST([FromForm]int? Id)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} delete action method",
+                nameof(CategoryController), nameof(this.DeletePOST));
+
+            if (Id == null)
+            {
+                return this.NotFound();
+            }
+
+            var category = await this._db.Categories.FirstOrDefaultAsync(c => c.Id == Id);
+            if(category == null)
+            {
+                return this.NotFound();
+            }
+            
+            this._db.Categories.Remove(category);
+            await this._db.SaveChangesAsync();
+
+            return this.RedirectToAction("Index", "Category");
         }
     }
 }
