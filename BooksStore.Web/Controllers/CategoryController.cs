@@ -75,5 +75,28 @@ namespace BooksStore.Web.Controllers
 
             return View();
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Edit([FromQuery]int? categoryId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
+                nameof(CategoryController), nameof(this.Edit));
+
+            if(categoryId == null)
+            {
+                return NotFound();
+            }
+
+            var category = await this._db.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            if (category == null) 
+            {
+                return NotFound();
+            }
+
+            var categoryUpdateRequest = category.ToCategoryUpdateRequest();
+
+            return View(categoryUpdateRequest);
+        }
     }
 }
