@@ -98,5 +98,24 @@ namespace BooksStore.Web.Controllers
 
             return View(categoryUpdateRequest);
         }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> Edit([FromForm]CategoryUpdateRequest categoryUpdateRequest)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} post action method",
+                nameof(CategoryController), nameof(this.Edit));
+
+            if(!this.ModelState.IsValid)
+            {
+                return View(categoryUpdateRequest);
+            }
+
+            var category = categoryUpdateRequest.ToCategory();
+            this._db.Categories.Update(category);
+            await this._db.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Category");
+        }
     }
 }
