@@ -15,5 +15,15 @@ namespace BooksStore.Web.Models.DTOs
         [Required(ErrorMessage = "Display Order is required")]
         [Range(1, 100, ErrorMessage = "Display Order must be between 1 and 100")]
         public int DisplayOrder { get; set; }
+
+        public Category ToCategory()
+        {
+            return new Category()
+            {
+                Id = this.Id,
+                Name = this.Name,
+                DisplayOrder = this.DisplayOrder
+            };
+        }
     }
 }
