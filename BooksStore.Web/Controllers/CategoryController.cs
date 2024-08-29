@@ -70,6 +70,8 @@ namespace BooksStore.Web.Controllers
                 this._db.Categories.Add(category);
                 await this._db.SaveChangesAsync();
 
+                this.TempData["Success"] = "Create category succesfully";
+
                 return this.RedirectToAction("Index", "Category");
             }
 
@@ -114,6 +116,8 @@ namespace BooksStore.Web.Controllers
             var category = categoryUpdateRequest.ToCategory();
             this._db.Categories.Update(category);
             await this._db.SaveChangesAsync();
+
+            this.TempData["Success"] = "Update category successfully";
 
             return this.RedirectToAction("Index", "Category");
         }
@@ -162,6 +166,8 @@ namespace BooksStore.Web.Controllers
             
             this._db.Categories.Remove(category);
             await this._db.SaveChangesAsync();
+
+            this.TempData["Success"] = "Delete category successfully";
 
             return this.RedirectToAction("Index", "Category");
         }
