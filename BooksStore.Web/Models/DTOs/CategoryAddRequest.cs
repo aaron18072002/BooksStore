@@ -5,6 +5,7 @@ namespace BooksStore.Web.Models.DTOs
     public class CategoryAddRequest
     {
         [Required(ErrorMessage = "Category name is required")]
+        [RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Category name only accepts letters")]
         [MaxLength(40, ErrorMessage = "Category name must be less than 40 characters")]
         public string? Name { get; set; }
 
