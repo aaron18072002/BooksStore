@@ -21,5 +21,15 @@ namespace BooksStore.Web.Models.DTOs
                 DisplayOrder = category.DisplayOrder,
             };
         }
+
+        public static CategoryUpdateRequest ToCategoryUpdateRequest(this Category category)
+        {
+            return new CategoryUpdateRequest()
+            {
+                Id = category.Id,
+                Name = category.Name,
+                DisplayOrder = category.DisplayOrder,
+            };
+        }
     }
 }
