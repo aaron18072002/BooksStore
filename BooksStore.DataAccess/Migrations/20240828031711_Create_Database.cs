@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace BooksStore.Web.Migrations
+namespace BooksStore.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class Create_Database : Migration

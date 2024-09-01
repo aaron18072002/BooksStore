@@ -22,4 +22,9 @@
     <Folder Include="Logs\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\BooksStore.DataAccess\BooksStore.DataAccess.csproj" />
+    <ProjectReference Include="..\BooksStore.Models\BooksStore.Models.csproj" />
+  </ItemGroup>
+
 </Project>

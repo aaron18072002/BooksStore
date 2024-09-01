@@ -1,5 +1,5 @@
-﻿using BooksStore.Web.Database;
-using BooksStore.Web.Models.DTOs;
+﻿using BooksStore.DataAccess.Database;
+using BooksStore.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

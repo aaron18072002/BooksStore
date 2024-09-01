@@ -1,4 +1,4 @@
-using BooksStore.Web.Database;
+using BooksStore.DataAccess.Database;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 

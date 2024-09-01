@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BooksStore.Models;
 
-namespace BooksStore.Web.Models.DTOs
+namespace BooksStore.Models.DTOs
 {
     public class CategoryAddRequest
     {
@@ -16,8 +17,8 @@ namespace BooksStore.Web.Models.DTOs
         {
             return new Category()
             {
-                Name = this.Name,
-                DisplayOrder = this.DisplayOrder
+                Name = Name,
+                DisplayOrder = DisplayOrder
             };
         }
     }

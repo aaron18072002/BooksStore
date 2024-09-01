@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using BooksStore.Models;
 
-namespace BooksStore.Web.Models.DTOs
+namespace BooksStore.Models.DTOs
 {
     public class CategoryResponse
     {
