@@ -1,15 +1,18 @@
 ﻿using BooksStore.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Text;
+using System.Text.Json;
 
 namespace BooksStore.DataAccess.Database
 {
     public class BooksStoreDbContext : DbContext
     {
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<Product> Products { get; set; }
         public BooksStoreDbContext(DbContextOptions<BooksStoreDbContext> options) : base(options)
         {
 
         }
-        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -38,6 +41,25 @@ namespace BooksStore.DataAccess.Database
             foreach (var category in categories)
             {
                 modelBuilder.Entity<Category>().HasData(category);
+            }
+
+            //seed data for products table
+            var stringBuilder = new StringBuilder();
+            using (var streamReader = new StreamReader(@"D:\\aspnetcore\\BooksStoreSolution\\BooksStore.Web\\products.json"))
+            {
+                string? line;
+                while((line = streamReader.ReadLine()) != null)
+                {
+                    stringBuilder.AppendLine(line);
+                }
+            };
+            var products = JsonSerializer.Deserialize<List<Product>>(stringBuilder.ToString());
+            if(products != null)
+            {
+                foreach (var product in products)
+                {
+                    modelBuilder.Entity<Product>().HasData(product);
+                }
             }
 
             base.OnModelCreating(modelBuilder);
