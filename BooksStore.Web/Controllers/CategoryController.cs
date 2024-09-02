@@ -10,10 +10,13 @@ namespace BooksStore.Web.Controllers
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepo;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<CategoryController> _logger;
-        public CategoryController(ICategoryRepository categoryRepo, ILogger<CategoryController> logger)
+        public CategoryController
+            (ICategoryRepository categoryRepo, IUnitOfWork unitOfWork, ILogger<CategoryController> logger)
         {
             this._categoryRepo = categoryRepo;
+            this._unitOfWork = unitOfWork;
             this._logger = logger;
         }
 
@@ -23,7 +26,7 @@ namespace BooksStore.Web.Controllers
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Index));
-            var categories = await this._categoryRepo.GetAll();
+            var categories = await this._unitOfWork.Categories.GetAll();
 
             var categoriesResponse = categories.Select(c => c.ToCategoryResponse()).ToList();
 
@@ -68,7 +71,8 @@ namespace BooksStore.Web.Controllers
             {
                 var category = categoryAddRequest.ToCategory();
 
-                await this._categoryRepo.Update(category);
+                await this._unitOfWork.Categories.Add(category);
+                await this._unitOfWork.Save();
 
                 this.TempData["Success"] = "Create category succesfully";
 
