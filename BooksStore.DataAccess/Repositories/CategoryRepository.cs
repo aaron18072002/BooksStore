@@ -20,9 +20,10 @@ namespace BooksStore.DataAccess.Repositories
             throw new NotImplementedException();
         }
 
-        public Task Update(Category category)
+        public async Task Update(Category category)
         {
-            throw new NotImplementedException();
+            this.DbSet.Update(category);
+            await this._db.SaveChangesAsync();
         }
     }
 }
