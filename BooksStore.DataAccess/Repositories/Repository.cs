@@ -1,5 +1,5 @@
 ﻿using BooksStore.DataAccess.Database;
-using BooksStore.DataAccess.Repositories.IRepository;
+using BooksStore.DataAccess.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
