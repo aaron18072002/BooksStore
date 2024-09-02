@@ -14,7 +14,7 @@ namespace BooksStore.Models
 
         [Required]
         [MaxLength(40)]
-        public string? Name { get; set; }
+        public string? Title { get; set; }
 
         [Required]
         [Display(Name = "International Standard Book Number")]
