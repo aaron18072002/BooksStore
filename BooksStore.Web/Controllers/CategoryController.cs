@@ -1,4 +1,5 @@
 ﻿using BooksStore.DataAccess.Database;
+using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,11 +9,11 @@ namespace BooksStore.Web.Controllers
     [Route("[controller]")]
     public class CategoryController : Controller
     {
-        private readonly BooksStoreDbContext _db;
+        private readonly ICategoryRepository _categoryRepo;
         private readonly ILogger<CategoryController> _logger;
-        public CategoryController(BooksStoreDbContext db, ILogger<CategoryController> logger)
+        public CategoryController(ICategoryRepository categoryRepo, ILogger<CategoryController> logger)
         {
-            this._db = db;
+            this._categoryRepo = categoryRepo;
             this._logger = logger;
         }
 
@@ -22,7 +23,7 @@ namespace BooksStore.Web.Controllers
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Index));
-            var categories = await this._db.Categories.ToListAsync();
+            var categories = await this._categoryRepo.GetAll();
 
             var categoriesResponse = categories.Select(c => c.ToCategoryResponse()).ToList();
 
@@ -67,8 +68,7 @@ namespace BooksStore.Web.Controllers
             {
                 var category = categoryAddRequest.ToCategory();
 
-                this._db.Categories.Add(category);
-                await this._db.SaveChangesAsync();
+                await this._categoryRepo.Update(category);
 
                 this.TempData["Success"] = "Create category succesfully";
 
@@ -90,7 +90,7 @@ namespace BooksStore.Web.Controllers
                 return this.NotFound();
             }
 
-            var category = await this._db.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+            var category = await this._categoryRepo.GetDetails(c => c.Id == categoryId);
             if (category == null) 
             {
                 return this.NotFound();
@@ -114,8 +114,7 @@ namespace BooksStore.Web.Controllers
             }
 
             var category = categoryUpdateRequest.ToCategory();
-            this._db.Categories.Update(category);
-            await this._db.SaveChangesAsync();
+            await this._categoryRepo.Update(category);
 
             this.TempData["Success"] = "Update category successfully";
 
@@ -134,8 +133,7 @@ namespace BooksStore.Web.Controllers
                 return this.NotFound();
             };
 
-            var category = await this._db.Categories.FirstOrDefaultAsync
-                (c => c.Id == categoryId);
+            var category = await this._categoryRepo.GetDetails(c => c.Id == categoryId);
             if(category == null)
             {
                 return this.NotFound();
@@ -158,14 +156,13 @@ namespace BooksStore.Web.Controllers
                 return this.NotFound();
             }
 
-            var category = await this._db.Categories.FirstOrDefaultAsync(c => c.Id == Id);
-            if(category == null)
+            var category = await this._categoryRepo.GetDetails(c => c.Id == Id);
+            if (category == null)
             {
                 return this.NotFound();
             }
             
-            this._db.Categories.Remove(category);
-            await this._db.SaveChangesAsync();
+            await this._categoryRepo.Remove(category);
 
             this.TempData["Success"] = "Delete category successfully";
 
