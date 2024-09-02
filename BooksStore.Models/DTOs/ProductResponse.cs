@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace BooksStore.Models.DTOs
 {
@@ -15,16 +16,21 @@ namespace BooksStore.Models.DTOs
 
         public string? Description { get; set; }
 
+        [Display(Name = "International Standard Book Number")]
         public string? ISBN { get; set; }
 
         public string? Author { get; set; }
 
+        [Display(Name = "List Price")]
         public decimal ListPrice { get; set; }
 
+        [Display(Name = "Price for 1-50")]
         public decimal Price { get; set; }
 
+        [Display(Name = "Price for 50+")]
         public decimal Price50 { get; set; }
 
+        [Display(Name = "Price for 100+")]
         public decimal Price100 { get; set; }
     }
     public static class ProductExtensions
