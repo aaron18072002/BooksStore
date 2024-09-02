@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace BooksStore.DataAccess.Repositories
 {
-    public class ProductCategory : Repository<Product>, IProductRepository
+    public class ProductRepository : Repository<Product>, IProductRepository
     {
-        public ProductCategory(BooksStoreDbContext db) : base(db) 
+        public ProductRepository(BooksStoreDbContext db) : base(db) 
         {
         }
 
