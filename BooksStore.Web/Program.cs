@@ -1,4 +1,6 @@
 using BooksStore.DataAccess.Database;
+using BooksStore.DataAccess.Repositories;
+using BooksStore.DataAccess.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -12,6 +14,8 @@ namespace BooksStore.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
             builder.Services.AddDbContext<BooksStoreDbContext>(options =>
             {
