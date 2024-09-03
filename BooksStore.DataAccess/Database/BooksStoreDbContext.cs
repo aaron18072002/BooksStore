@@ -62,6 +62,13 @@ namespace BooksStore.DataAccess.Database
                 }
             }
 
+            //Add foreign key
+            modelBuilder.Entity<Product>()
+                .HasOne(e => e.Category)
+                .WithMany()
+                .HasForeignKey(e => e.CategoryId)
+                .HasPrincipalKey(c => c.Id);
+
             base.OnModelCreating(modelBuilder);
         }
     }
