@@ -34,7 +34,7 @@ namespace BooksStore.Models.DTOs
         public decimal Price100 { get; set; }
 
         [Display(Name = "Category")]
-        public int CategoryName { get; set; }
+        public string? CategoryName { get; set; }
 
         [Display(Name = "Image")]
         public string? ImageUrl { get; set; }
