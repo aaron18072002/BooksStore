@@ -1,4 +1,5 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
+using BooksStore.Models;
 using BooksStore.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,6 +18,14 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             this._logger = logger;
         }
 
+        private ProductResponse ConvertProductToProductResponse(Product product)
+        {
+            var productResponse = product.ToProductResponse();
+            productResponse.CategoryName = product?.Category?.Name;
+
+            return productResponse;
+        }
+
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> Index()
@@ -25,7 +34,8 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 nameof(CategoryController), nameof(this.Index));
             var products = await _unitOfWork.Products.GetAll();
 
-            var productsResponse = products.Select(p => p.ToProductResponse()).ToList();       
+            var productsResponse = products.Select
+                (p => this.ConvertProductToProductResponse(p)).ToList();       
 
             return View(productsResponse);
         }

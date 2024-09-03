@@ -15,7 +15,7 @@
 </div>
 
 <div class="card-body p-4">
-    <form method="post" class="row">
+    <form method="post" class="row" enctype="multipart/form-data">
         <div class="border p-3">
             @*<div asp-validation-summary="ModelOnly"></div>*@
             <div class="form-floating py-2 col-12">
@@ -59,6 +59,12 @@
                 <input asp-for="Price100" type="number" class="form-control border-0 shadow" />
                 <label asp-for="Price100" class="ms-2"></label>
                 <span asp-validation-for="Price100" class="text-danger"></span>
+            </div>
+
+            <div class="form-floating py-2 col-12">
+                <input asp-for="ImageUrl" type="file" class="form-control border-0 shadow" />
+                <label asp-for="ImageUrl" class="ms-2"></label>
+                <span asp-validation-for="ImageUrl" class="text-danger"></span>
             </div>
 
             <div class="form-floating py-2 col-12">
