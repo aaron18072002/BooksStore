@@ -1,6 +1,7 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models.DTOs;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace BooksStore.Web.Areas.Admin.Controllers
 {
@@ -24,17 +25,27 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 nameof(CategoryController), nameof(this.Index));
             var products = await _unitOfWork.Products.GetAll();
 
-            var categoriesResponse = products.Select(p => p.ToProductResponse()).ToList();
+            var productsResponse = products.Select(p => p.ToProductResponse()).ToList();       
 
-            return View(categoriesResponse);
+            return View(productsResponse);
         }
 
         [HttpGet]
         [Route("[action]")]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
             _logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Create));
+
+            var categories =  await _unitOfWork.Categories.GetAll();
+
+            var categoriesList = categories.Select(c => new SelectListItem()
+            {
+                Text = c.Name,
+                Value = c.Id.ToString()
+            }).ToList();
+
+            this.ViewBag.Categories = categoriesList;   
 
             return View();
         }
