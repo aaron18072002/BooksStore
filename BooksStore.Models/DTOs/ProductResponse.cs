@@ -32,6 +32,9 @@ namespace BooksStore.Models.DTOs
 
         [Display(Name = "Price for 100+")]
         public decimal Price100 { get; set; }
+
+        [Display(Name = "Category")]
+        public int CategoryName { get; set; }
     }
     public static class ProductExtensions
     {
@@ -62,7 +65,8 @@ namespace BooksStore.Models.DTOs
                 ListPrice = product.ListPrice,
                 Price = product.Price,
                 Price50 = product.Price50,
-                Price100 = product.Price100
+                Price100 = product.Price100,
+                CategoryId = product.CategoryId,
             };
         }
     }

@@ -46,6 +46,10 @@ namespace BooksStore.Models.DTOs
         [Display(Name = "Price for 100+")]
         [Range(1, 1000, ErrorMessage = "Price for 100+ must be between 1 and 1000.")]
         public decimal Price100 { get; set; }
+
+        [Required(ErrorMessage = "Category is required")]
+        [Display(Name = "Category")]
+        public int CategoryId { get; set; }
         public Product ToProduct()
         {
             return new Product()
@@ -59,6 +63,7 @@ namespace BooksStore.Models.DTOs
                 Price = this.Price,
                 Price50 = this.Price50,
                 Price100 = this.Price100,
+                CategoryId = this.CategoryId,
             };
         }
     }
