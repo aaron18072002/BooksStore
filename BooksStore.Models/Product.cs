@@ -49,6 +49,8 @@ namespace BooksStore.Models
         [Range(1, 1000)]
         public decimal Price100 { get; set; }
 
+        public string? ImageUrl { get; set; }
+
         public int CategoryId { get; set; }
 
         [ForeignKey(nameof(this.CategoryId))]
