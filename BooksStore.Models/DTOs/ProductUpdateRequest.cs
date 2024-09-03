@@ -50,6 +50,11 @@ namespace BooksStore.Models.DTOs
         [Required(ErrorMessage = "Category is required")]
         [Display(Name = "Category")]
         public int CategoryId { get; set; }
+
+        [Required(ErrorMessage = "ImageUrl is required")]
+        [Display(Name = "Image")]
+        public string? ImageUrl { get; set; }
+
         public Product ToProduct()
         {
             return new Product()
@@ -64,6 +69,7 @@ namespace BooksStore.Models.DTOs
                 Price50 = this.Price50,
                 Price100 = this.Price100,
                 CategoryId = this.CategoryId,
+                ImageUrl = this.ImageUrl,
             };
         }
     }

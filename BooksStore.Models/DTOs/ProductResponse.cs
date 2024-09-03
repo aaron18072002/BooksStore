@@ -35,6 +35,9 @@ namespace BooksStore.Models.DTOs
 
         [Display(Name = "Category")]
         public int CategoryName { get; set; }
+
+        [Display(Name = "Image")]
+        public string? ImageUrl { get; set; }
     }
     public static class ProductExtensions
     {
@@ -50,7 +53,8 @@ namespace BooksStore.Models.DTOs
                 ListPrice = product.ListPrice,
                 Price = product.Price,
                 Price50 = product.Price50,
-                Price100 = product.Price100             
+                Price100 = product.Price100,
+                ImageUrl = product.ImageUrl,
             };
         }
         public static ProductUpdateRequest ToProductUpdateRequest(this Product product)
@@ -67,6 +71,7 @@ namespace BooksStore.Models.DTOs
                 Price50 = product.Price50,
                 Price100 = product.Price100,
                 CategoryId = product.CategoryId,
+                ImageUrl = product.ImageUrl,
             };
         }
     }
