@@ -154,12 +154,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             _logger.LogInformation("{ControllerName}.{MethodName} post action method",
                 nameof(CategoryController), nameof(this.Edit));
 
-            if (!ModelState.IsValid)
-            {
-                return View(productUpdateVM);
-            }
-
-            var wwwRootPath = this._webHostEnvironment.WebRootPath;
+            var wwwRootPath = this._webHostEnvironment.WebRootPath;        
 
             if (productUpdateVM.File != null)
             {
@@ -172,16 +167,27 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                     productUpdateVM.File.CopyTo(fileStream);
                 }
 
+                if (productUpdateVM.ProductUpdateRequest.ImageUrl != null)
+                {
+                    var oldImagePath =
+                               Path.Combine(wwwRootPath, productUpdateVM.ProductUpdateRequest.ImageUrl.TrimStart('\\'));
+
+                    if (System.IO.File.Exists(oldImagePath))
+                    {
+                        System.IO.File.Delete(oldImagePath);
+                    }
+                }
+
                 productUpdateVM.ProductUpdateRequest.ImageUrl = @"\images\product\" + fileName;
 
-                var product = productUpdateVM.ProductUpdateRequest.ToProduct();
-
-                await this._unitOfWork.Products.Update(product);
-                await this._unitOfWork.Save();
-
-                TempData["Success"] = "Update product successfully";
             }
 
+            var product = productUpdateVM.ProductUpdateRequest.ToProduct();
+
+            await this._unitOfWork.Products.Update(product);
+            await this._unitOfWork.Save();
+
+            TempData["Success"] = "Update product successfully";
 
             return RedirectToAction("Index", "Product");
         }
