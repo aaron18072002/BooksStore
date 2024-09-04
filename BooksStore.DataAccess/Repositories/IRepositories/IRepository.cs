@@ -9,9 +9,9 @@ namespace BooksStore.DataAccess.Repositories.IRepositories
 {
     public interface IRepository<T> where T : class
     {
-        Task<IEnumerable<T>> GetAll();
+        Task<IEnumerable<T>> GetAll(string? includeProperties = null);
 
-        Task<T?> GetDetails(Expression<Func<T, bool>> filter);
+        Task<T?> GetDetails(Expression<Func<T, bool>> filter, string? includeProperties = null);
 
         Task<T> Add(T entity);
 

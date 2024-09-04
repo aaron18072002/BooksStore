@@ -36,7 +36,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         {
             _logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Index));
-            var products = await _unitOfWork.Products.GetAll();
+            var products = await _unitOfWork.Products.GetAll(includeProperties: "Category");
 
             var productsResponse = products.Select
                 (p => this.ConvertProductToProductResponse(p)).ToList();

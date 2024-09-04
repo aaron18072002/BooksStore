@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BooksStore.DataAccess.Repositories
 {
@@ -18,6 +19,7 @@ namespace BooksStore.DataAccess.Repositories
         {
             this._db = db;
             this.DbSet = this._db.Set<T>();
+            this._db.Products.Include(p => p.Category).Include(p => p.CategoryId);
         }
 
         public async Task<T> Add(T entity)
@@ -28,18 +30,38 @@ namespace BooksStore.DataAccess.Repositories
             return entity;
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public async Task<IEnumerable<T>> GetAll(string? includeProperties = null)
         {
-            var result = await this.DbSet.ToListAsync();
+            IQueryable<T> result = this.DbSet;
 
-            return result;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties
+                    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    result = result.Include(includeProp);
+                }
+            }
+
+            return await result.ToListAsync();
         }
 
-        public async Task<T?> GetDetails(Expression<Func<T, bool>> filter)
+        public async Task<T?> GetDetails
+            (Expression<Func<T, bool>> filter, string? includeProperties = null)
         {
-            var result = await this.DbSet.FirstOrDefaultAsync(filter);
+            IQueryable<T> result = this.DbSet;
+            result = result.Where(filter);
 
-            return result;
+            if (!string.IsNullOrEmpty(includeProperties))
+            {
+                foreach (var includeProp in includeProperties
+                    .Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
+                {
+                    result = result.Include(includeProp);
+                }
+            }
+
+            return await result.FirstOrDefaultAsync();
         }
 
         public async Task<bool> Remove(T entity)
