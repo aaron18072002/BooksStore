@@ -34,7 +34,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Index()
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} action get method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Index));
             var products = await _unitOfWork.Products.GetAll(includeProperties: "Category");
 
@@ -48,7 +48,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Create()
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} action get method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Create));
 
             var categories = await _unitOfWork.Categories.GetAll();
@@ -69,7 +69,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         public async Task<IActionResult> Create
             ([FromForm] ProductCreateVM productCreateVM)
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} action post method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} action post method",
                 nameof(CategoryController), nameof(this.Create));
 
             if (productCreateVM == null)
@@ -113,7 +113,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Edit([FromQuery] int? productId)
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} get action method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
                 nameof(CategoryController), nameof(this.Edit));
 
             if (productId == null)
@@ -151,7 +151,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Edit([FromForm] ProductUpdateVM productUpdateVM)
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} post action method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} post action method",
                 nameof(CategoryController), nameof(this.Edit));
 
             var wwwRootPath = this._webHostEnvironment.WebRootPath;        
@@ -196,7 +196,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> Delete([FromQuery] int? productId)
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} get action method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
                 nameof(CategoryController), nameof(this.Delete));
 
             if (productId == null)
@@ -219,7 +219,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> DeletePOST([FromForm] int? Id)
         {
-            _logger.LogInformation("{ControllerName}.{MethodName} delete action method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} delete action method",
                 nameof(CategoryController), nameof(this.DeletePOST));
 
             if (Id == null)
@@ -246,6 +246,9 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetAllProducts()
         {
+            this._logger.LogInformation("{ControllerName}.{MethodName} api action method",
+                nameof(CategoryController), nameof(this.GetAllProducts));
+
             var productsList = await this._unitOfWork.Products.GetAll(includeProperties: "Category");
             var productsResponseList = productsList.Select
                 (p => this.ConvertProductToProductResponse(p)).ToList();
