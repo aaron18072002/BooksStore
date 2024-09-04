@@ -1,6 +1,8 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
 using BooksStore.Models.DTOs;
+using BooksStore.Models.ViewModels;
+using BooksStore.Web.Utilities;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -12,10 +14,12 @@ namespace BooksStore.Web.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ProductController> _logger;
-        public ProductController(IUnitOfWork unitOfWork, ILogger<ProductController> logger)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+        public ProductController(IUnitOfWork unitOfWork, ILogger<ProductController> logger, IWebHostEnvironment webHostEnvironment)
         {
             this._unitOfWork = unitOfWork;
             this._logger = logger;
+            this._webHostEnvironment = webHostEnvironment;
         }
 
         private ProductResponse ConvertProductToProductResponse(Product product)
@@ -63,24 +67,39 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> Create
-            ([FromForm] ProductAddRequest productAddRequest)
+            ([FromForm] ProductCreateVM productCreateVM)
         {
             _logger.LogInformation("{ControllerName}.{MethodName} action post method",
                 nameof(CategoryController), nameof(this.Create));
 
-            if (productAddRequest == null)
+            if (productCreateVM == null)
             {
-                throw new ArgumentNullException(nameof(productAddRequest));
+                throw new ArgumentNullException(nameof(productCreateVM));
             }
 
-            if (productAddRequest.Title == null)
+            if (productCreateVM.ProductAddRequest == null)
             {
-                throw new ArgumentException(nameof(productAddRequest));
+                throw new ArgumentException(nameof(productCreateVM));
             }
 
             if (ModelState.IsValid)
             {
-                var product = productAddRequest.ToProduct();
+                var wwwRootPath = this._webHostEnvironment.WebRootPath;
+                if(productCreateVM.File != null)
+                {
+                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension
+                        (productCreateVM.File.FileName);
+                    string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                    {
+                        productCreateVM.File.CopyTo(fileStream);
+                    }
+
+                    productCreateVM.ProductAddRequest.ImageUrl = @"\images\product\" + fileName;
+                }
+
+                var product = productCreateVM.ProductAddRequest.ToProduct();
 
                 await _unitOfWork.Products.Add(product);
                 await _unitOfWork.Save();
