@@ -239,5 +239,19 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
             return RedirectToAction("Index", "Product");
         }
+
+        #region APIs
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> GetAllProducts()
+        {
+            var productsList = await this._unitOfWork.Products.GetAll();
+
+            return Json(new
+            {
+                Data = productsList
+            });
+        }
+        #endregion
     }
 }
