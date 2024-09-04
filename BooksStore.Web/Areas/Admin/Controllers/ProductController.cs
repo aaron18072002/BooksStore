@@ -204,7 +204,8 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 return NotFound();
             };
 
-            var product = await this._unitOfWork.Products.GetDetails(p => p.Id == productId);
+            var product = await this._unitOfWork.Products.GetDetails
+                (p => p.Id == productId, includeProperties: "Category");
             if (product == null)
             {
                 return NotFound();
@@ -245,11 +246,13 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetAllProducts()
         {
-            var productsList = await this._unitOfWork.Products.GetAll();
+            var productsList = await this._unitOfWork.Products.GetAll(includeProperties: "Category");
+            var productsResponseList = productsList.Select
+                (p => this.ConvertProductToProductResponse(p)).ToList();
 
             return Json(new
             {
-                Data = productsList
+                Data = productsResponseList
             });
         }
         #endregion
