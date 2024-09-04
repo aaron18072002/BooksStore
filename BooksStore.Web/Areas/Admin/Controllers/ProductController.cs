@@ -111,17 +111,17 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> Edit([FromQuery] int? productId)
+        public async Task<IActionResult> Edit([FromQuery] int? id)
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
                 nameof(CategoryController), nameof(this.Edit));
 
-            if (productId == null)
+            if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await this._unitOfWork.Products.GetDetails(p => p.Id == productId);
+            var product = await this._unitOfWork.Products.GetDetails(p => p.Id == id);
             if (product == null)
             {
                 return NotFound();
@@ -154,7 +154,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             this._logger.LogInformation("{ControllerName}.{MethodName} post action method",
                 nameof(CategoryController), nameof(this.Edit));
 
-            var wwwRootPath = this._webHostEnvironment.WebRootPath;        
+            var wwwRootPath = this._webHostEnvironment.WebRootPath;
 
             if (productUpdateVM.File != null)
             {
@@ -192,29 +192,30 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             return RedirectToAction("Index", "Product");
         }
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> Delete([FromQuery] int? productId)
-        {
-            this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
-                nameof(CategoryController), nameof(this.Delete));
+        //[HttpGet]
+        //[Route("[action]")]
+        //public async Task<IActionResult> Delete([FromQuery] int? productId)
+        //{
+        //    this._logger.LogInformation("{ControllerName}.{MethodName} get action method",
+        //        nameof(CategoryController), nameof(this.Delete));
 
-            if (productId == null)
-            {
-                return NotFound();
-            };
+        //    if (productId == null)
+        //    {
+        //        return NotFound();
+        //    };
 
-            var product = await this._unitOfWork.Products.GetDetails
-                (p => p.Id == productId, includeProperties: "Category");
-            if (product == null)
-            {
-                return NotFound();
-            }
+        //    var product = await this._unitOfWork.Products.GetDetails
+        //        (p => p.Id == productId, includeProperties: "Category");
+        //    if (product == null)
+        //    {
+        //        return NotFound();
+        //    }
 
-            var productResponse = this.ConvertProductToProductResponse(product);
+        //    var productResponse = this.ConvertProductToProductResponse(product);
 
-            return View(productResponse);
-        }
+        //    return View(productResponse);
+        //}
+
         [HttpPost]
         [Route("[action]")]
         public async Task<IActionResult> DeletePOST([FromForm] int? Id)
@@ -257,6 +258,33 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             {
                 Data = productsResponseList
             });
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Delete([FromQuery] int? id)
+        {
+            var productToBeDeleted = await this._unitOfWork.Products.GetDetails(p => p.Id == id);
+            if (productToBeDeleted == null)
+            {
+                return Json(new { Success = false, Message = "Error while deleting" });
+            }
+
+            if (productToBeDeleted.ImageUrl != null)
+            {
+                var oldImagePath = Path.Combine
+                    (this._webHostEnvironment.WebRootPath, productToBeDeleted.ImageUrl.TrimStart('\\'));
+
+                if (System.IO.File.Exists(oldImagePath))
+                {
+                    System.IO.File.Delete(oldImagePath);
+                }
+            }
+
+            await this._unitOfWork.Products.Remove(productToBeDeleted);
+            await this._unitOfWork.Save();
+
+            return Json( new { Success = true, Message = "Delete product successfully"} );
         }
         #endregion
     }
