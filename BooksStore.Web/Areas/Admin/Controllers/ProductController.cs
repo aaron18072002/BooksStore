@@ -247,7 +247,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetAllProducts()
         {
-            this._logger.LogInformation("{ControllerName}.{MethodName} api action method",
+            this._logger.LogInformation("{ControllerName}.{MethodName} get api action method",
                 nameof(CategoryController), nameof(this.GetAllProducts));
 
             var productsList = await this._unitOfWork.Products.GetAll(includeProperties: "Category");
@@ -260,10 +260,13 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             });
         }
 
-        [HttpGet]
+        [HttpDelete]
         [Route("[action]")]
         public async Task<IActionResult> Delete([FromQuery] int? id)
         {
+            this._logger.LogInformation("{ControllerName}.{MethodName} delete api action method",
+                nameof(CategoryController), nameof(this.Delete));
+
             var productToBeDeleted = await this._unitOfWork.Products.GetDetails(p => p.Id == id);
             if (productToBeDeleted == null)
             {
