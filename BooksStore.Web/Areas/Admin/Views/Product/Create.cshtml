@@ -23,9 +23,9 @@
                 <label asp-for="Title" class="ms-2"></label>
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
-            <div class="form-floating py-2 col-12">
+            <div class="py-2 col-12">
+                <label asp-for="Description" class="ms-2 text-muted"></label>
                 <textarea asp-for="Description" type="text" class="form-control border-0 shadow"></textarea>
-                <label asp-for="Description" class="ms-2"></label>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-floating py-2 col-12">
@@ -90,6 +90,13 @@
 </div>
 
 @section Scripts {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons  lists   table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |  align lineheight | numlist bullist indent outdent',
+        });
+    </script>
     @{
         <partial name="_ValidationScriptsPartial" />
     }
