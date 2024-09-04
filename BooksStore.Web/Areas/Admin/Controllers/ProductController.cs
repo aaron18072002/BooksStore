@@ -39,7 +39,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             var products = await _unitOfWork.Products.GetAll();
 
             var productsResponse = products.Select
-                (p => this.ConvertProductToProductResponse(p)).ToList();       
+                (p => this.ConvertProductToProductResponse(p)).ToList();
 
             return View(productsResponse);
         }
@@ -51,7 +51,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             _logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CategoryController), nameof(this.Create));
 
-            var categories =  await _unitOfWork.Categories.GetAll();
+            var categories = await _unitOfWork.Categories.GetAll();
 
             var categoriesList = categories.Select(c => new SelectListItem()
             {
@@ -59,7 +59,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 Value = c.Id.ToString()
             }).ToList();
 
-            this.ViewBag.Categories = categoriesList;   
+            this.ViewBag.Categories = categoriesList;
 
             return View();
         }
@@ -82,27 +82,24 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 throw new ArgumentException(nameof(productCreateVM));
             }
 
-            if (ModelState.IsValid)
+            var wwwRootPath = this._webHostEnvironment.WebRootPath;
+            if (productCreateVM.File != null)
             {
-                var wwwRootPath = this._webHostEnvironment.WebRootPath;
-                if(productCreateVM.File != null)
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension
+                    (productCreateVM.File.FileName);
+                string productPath = Path.Combine(wwwRootPath, @"images\product");
+
+                using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
                 {
-                    string fileName = Guid.NewGuid().ToString() + Path.GetExtension
-                        (productCreateVM.File.FileName);
-                    string productPath = Path.Combine(wwwRootPath, @"images\product");
-
-                    using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
-                    {
-                        productCreateVM.File.CopyTo(fileStream);
-                    }
-
-                    productCreateVM.ProductAddRequest.ImageUrl = @"\images\product\" + fileName;
+                    productCreateVM.File.CopyTo(fileStream);
                 }
+
+                productCreateVM.ProductAddRequest.ImageUrl = @"\images\product\" + fileName;
 
                 var product = productCreateVM.ProductAddRequest.ToProduct();
 
-                await _unitOfWork.Products.Add(product);
-                await _unitOfWork.Save();
+                await this._unitOfWork.Products.Add(product);
+                await this._unitOfWork.Save();
 
                 TempData["Success"] = "Create product succesfully";
 
@@ -142,27 +139,49 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
             this.ViewBag.Categories = categoriesList;
 
-            return View(productUpdateRequest);
+            var productUpdateVM = new ProductUpdateVM()
+            {
+                ProductUpdateRequest = productUpdateRequest,
+            };
+
+            return View(productUpdateVM);
         }
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> Edit([FromForm] ProductUpdateRequest productUpdateRequest)
+        public async Task<IActionResult> Edit([FromForm] ProductUpdateVM productUpdateVM)
         {
             _logger.LogInformation("{ControllerName}.{MethodName} post action method",
                 nameof(CategoryController), nameof(this.Edit));
 
             if (!ModelState.IsValid)
             {
-                return View(productUpdateRequest);
+                return View(productUpdateVM);
             }
 
-            var product = productUpdateRequest.ToProduct();
+            var wwwRootPath = this._webHostEnvironment.WebRootPath;
 
-            await this._unitOfWork.Products.Update(product);
-            await this._unitOfWork.Save();
+            if (productUpdateVM.File != null)
+            {
+                string fileName = Guid.NewGuid().ToString() + Path.GetExtension
+                           (productUpdateVM.File.FileName);
+                string productPath = Path.Combine(wwwRootPath, @"images\product");
 
-            TempData["Success"] = "Update product successfully";
+                using (var fileStream = new FileStream(Path.Combine(productPath, fileName), FileMode.Create))
+                {
+                    productUpdateVM.File.CopyTo(fileStream);
+                }
+
+                productUpdateVM.ProductUpdateRequest.ImageUrl = @"\images\product\" + fileName;
+
+                var product = productUpdateVM.ProductUpdateRequest.ToProduct();
+
+                await this._unitOfWork.Products.Update(product);
+                await this._unitOfWork.Save();
+
+                TempData["Success"] = "Update product successfully";
+            }
+
 
             return RedirectToAction("Index", "Product");
         }
