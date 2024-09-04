@@ -113,6 +113,16 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
             var productUpdateRequest = product.ToProductUpdateRequest();
 
+            var categories = await _unitOfWork.Categories.GetAll();
+
+            var categoriesList = categories.Select(c => new SelectListItem()
+            {
+                Text = c.Name,
+                Value = c.Id.ToString()
+            }).ToList();
+
+            this.ViewBag.Categories = categoriesList;
+
             return View(productUpdateRequest);
         }
 
@@ -156,7 +166,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var productResponse = product.ToProductResponse();
+            var productResponse = this.ConvertProductToProductResponse(product);
 
             return View(productResponse);
         }
