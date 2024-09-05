@@ -3,6 +3,7 @@ using BooksStore.DataAccess.Repositories;
 using BooksStore.DataAccess.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Microsoft.AspNetCore.Identity;
 
 namespace BooksStore.Web
 {
@@ -23,6 +24,8 @@ namespace BooksStore.Web
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
+
+            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true).AddEntityFrameworkStores<BooksStoreDbContext>();
 
             builder.Services.AddHttpLogging(logging =>
             {

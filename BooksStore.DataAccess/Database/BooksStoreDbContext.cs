@@ -1,4 +1,5 @@
 ﻿using BooksStore.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Text.Json;
 
 namespace BooksStore.DataAccess.Database
 {
-    public class BooksStoreDbContext : IdentityDbContext
+    public class BooksStoreDbContext : IdentityDbContext<IdentityUser>
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -17,6 +18,8 @@ namespace BooksStore.DataAccess.Database
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             //seed data for category table
             var categories = new List<Category>()
             {
@@ -68,9 +71,7 @@ namespace BooksStore.DataAccess.Database
                 .HasOne(e => e.Category)
                 .WithMany()
                 .HasForeignKey(e => e.CategoryId)
-                .HasPrincipalKey(c => c.Id);
-
-            base.OnModelCreating(modelBuilder);
+                .HasPrincipalKey(c => c.Id);           
         }
     }
 }
