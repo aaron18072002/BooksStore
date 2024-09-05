@@ -68,6 +68,8 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             return this.View(productResponse);
         }
 
+        [HttpGet]
+        [Route("[action]")]
         public IActionResult Privacy()
         {
             return View();
