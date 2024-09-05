@@ -1,11 +1,12 @@
 ﻿using BooksStore.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Text;
 using System.Text.Json;
 
 namespace BooksStore.DataAccess.Database
 {
-    public class BooksStoreDbContext : DbContext
+    public class BooksStoreDbContext : IdentityDbContext
     {
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
