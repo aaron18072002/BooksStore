@@ -15,6 +15,7 @@ namespace BooksStore.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
@@ -64,6 +65,7 @@ namespace BooksStore.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapRazorPages();
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{area=Customer}/{controller=Home}/{action=Index}/{id?}");
