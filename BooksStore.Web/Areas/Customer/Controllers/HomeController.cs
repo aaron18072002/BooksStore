@@ -43,6 +43,31 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             return View(productsResponse);
         }
 
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> ProductDetails([FromQuery]int? productId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(HomeController), nameof(this.ProductDetails));
+
+            if (productId == null)
+            {
+                return this.NotFound();
+            }
+
+            var product = await this._unitOfWork.Products.GetDetails
+                ((p) => p.Id == productId, includeProperties: "Category");
+
+            if(product == null)
+            {
+                return this.NotFound();
+            }
+
+            var productResponse = this.ConvertProductToProductResponse(product);
+
+            return this.View(productResponse);
+        }
+
         public IActionResult Privacy()
         {
             return View();
