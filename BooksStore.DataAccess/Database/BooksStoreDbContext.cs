@@ -12,6 +12,7 @@ namespace BooksStore.DataAccess.Database
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
         public BooksStoreDbContext(DbContextOptions<BooksStoreDbContext> options) : base(options)
         {
 
@@ -53,13 +54,13 @@ namespace BooksStore.DataAccess.Database
             using (var streamReader = new StreamReader(@"D:\\aspnetcore\\BooksStoreSolution\\BooksStore.Web\\products.json"))
             {
                 string? line;
-                while((line = streamReader.ReadLine()) != null)
+                while ((line = streamReader.ReadLine()) != null)
                 {
                     stringBuilder.AppendLine(line);
                 }
             };
             var products = JsonSerializer.Deserialize<List<Product>>(stringBuilder.ToString());
-            if(products != null)
+            if (products != null)
             {
                 foreach (var product in products)
                 {
@@ -67,12 +68,45 @@ namespace BooksStore.DataAccess.Database
                 }
             }
 
+            //Seed data for companies table
+            modelBuilder.Entity<Company>().HasData(
+                new Company
+                {
+                    Id = 1,
+                    Name = "Tech Solution",
+                    StreetAddress = "123 Tech St",
+                    City = "Tech City",
+                    PostalCode = "48291",
+                    State = "IL",
+                    PhoneNumber = "0938273645"
+                },
+                new Company
+                {
+                    Id = 2,
+                    Name = "Vivid Books",
+                    StreetAddress = "999 Vid St",
+                    City = "Vid City",
+                    PostalCode = "23958",
+                    State = "IL",
+                    PhoneNumber = "0965128390"
+                },
+                new Company
+                {
+                    Id = 3,
+                    Name = "Readers Club",
+                    StreetAddress = "999 Main St",
+                    City = "Lala land",
+                    PostalCode = "71924",
+                    State = "NY",
+                    PhoneNumber = "0917465283"
+                });
+
             //Add foreign key
             modelBuilder.Entity<Product>()
                 .HasOne(e => e.Category)
                 .WithMany()
                 .HasForeignKey(e => e.CategoryId)
-                .HasPrincipalKey(c => c.Id);           
+                .HasPrincipalKey(c => c.Id);
         }
     }
 }
