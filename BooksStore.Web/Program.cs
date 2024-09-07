@@ -1,4 +1,4 @@
-using BooksStore.DataAccess.Database;
+﻿using BooksStore.DataAccess.Database;
 using BooksStore.DataAccess.Repositories;
 using BooksStore.DataAccess.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
@@ -33,6 +33,12 @@ namespace BooksStore.Web
             builder.Services.AddIdentity<IdentityUser, IdentityRole>
                 (options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<BooksStoreDbContext>()
                 .AddDefaultTokenProviders();
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = $"/Identity/Account/Login"; //để ứng dụng chuyển hướng đến nếu truy cập chức năng nào đó cần User phải đăng nhập
+                options.LogoutPath = $"/Identity/Account/Logout"; //nhấn vào liên kết đăng xuất, họ sẽ được chuyển hướng đến đường dẫn này để tiến hành đăng xuất khỏi hệ thống.
+                options.AccessDeniedPath = $"/Identity/Account/AccessDenied"; //chuyển hướng đến nếu User truy cập chức năng nào đó mà không được phân quyền (không có role được phép truy cập)
+            });
 
             builder.Services.AddHttpLogging(logging =>
             {
