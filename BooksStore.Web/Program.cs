@@ -4,6 +4,8 @@ using BooksStore.DataAccess.Repositories.IRepositories;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Microsoft.AspNetCore.Identity;
+using BooksStore.Utilities;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 namespace BooksStore.Web
 {
@@ -21,12 +23,15 @@ namespace BooksStore.Web
 
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
+            builder.Services.AddScoped<IEmailSender, EmailSender>();
+
             builder.Services.AddDbContext<BooksStoreDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<BooksStoreDbContext>();
+            builder.Services.AddIdentity<IdentityUser, IdentityRole>
+                (options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<BooksStoreDbContext>();
 
             builder.Services.AddHttpLogging(logging =>
             {
