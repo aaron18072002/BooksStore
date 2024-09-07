@@ -105,6 +105,29 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
             [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
             public string ConfirmPassword { get; set; }
 
+            [Required(ErrorMessage = "Name is required.")]
+            [MaxLength(40, ErrorMessage = "Name cannot exceed 40 characters.")]
+            public string Name { get; set; }
+
+            [MaxLength(100, ErrorMessage = "Street Address cannot exceed 100 characters.")]
+            [Display(Name = "Street Address")]
+            public string StreetAddress { get; set; }
+
+            [MaxLength(40, ErrorMessage = "City cannot exceed 40 characters.")]
+            public string City { get; set; }
+
+            [MaxLength(40, ErrorMessage = "State cannot exceed 40 characters.")]
+            public string State { get; set; }
+
+            [Required(ErrorMessage = "Postal Code is required.")]
+            [Display(Name = "Postal Code")]
+            [MaxLength(5, ErrorMessage = "Postal Code cannot exceed 5 characters.")]
+            public string PostalCode { get; set; }
+
+            [Required(ErrorMessage = "Phone Number is required.")]
+            [MaxLength(10, ErrorMessage = "Phone Number cannot exceed 10 characters.")]
+            public string PhoneNumber { get; set; }
+
             public string Role { get; set; }
 
             [ValidateNever]
@@ -145,6 +168,13 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
+                user.StreetAddress = Input.StreetAddress;
+                user.City = Input.City;
+                user.Name = Input.Name;
+                user.State = Input.State;
+                user.PostalCode = Input.PostalCode;
+                user.PhoneNumber = Input.PhoneNumber;
+
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
