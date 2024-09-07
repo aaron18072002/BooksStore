@@ -206,6 +206,11 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
                         await _userManager.AddToRoleAsync(user, StaticDetails.Role_Customer);
                     }
 
+                    if (Input.Role == StaticDetails.Role_Company)
+                    {
+                        user.CompanyId = Input.CompanyId;
+                    }
+
                     var userId = await _userManager.GetUserIdAsync(user);
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                     code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
