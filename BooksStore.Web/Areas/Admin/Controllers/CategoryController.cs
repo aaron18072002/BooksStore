@@ -1,12 +1,15 @@
 ﻿using BooksStore.DataAccess.Database;
 using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models.DTOs;
+using BooksStore.Utilities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace BooksStore.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = StaticDetails.Role_Admin)]
     [Route("[area]/[controller]")]
     public class CategoryController : Controller
     {
