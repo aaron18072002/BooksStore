@@ -13,11 +13,13 @@ namespace BooksStore.DataAccess.Repositories
         private readonly BooksStoreDbContext _db;
         public ICategoryRepository Categories { get; private set; }
         public IProductRepository Products { get; private set; }
+        public ICompanyRepository Companies { get; private set; }
         public UnitOfWork(BooksStoreDbContext db)
         {
             this._db = db;
             this.Categories = new CategoryRepository(db);
             this.Products = new ProductRepository(db);
+            this.Companies = new CompanyRepository(db);
         }
 
         public async Task Save()
