@@ -10,6 +10,7 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
 using BooksStore.Utilities;
 using Microsoft.AspNetCore.Authentication;
@@ -34,6 +35,7 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<IdentityUser> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly IUnitOfWork _unitOfWork;
 
         public RegisterModel(
             UserManager<IdentityUser> userManager,
@@ -41,15 +43,17 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
             IUserStore<IdentityUser> userStore,
             SignInManager<IdentityUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IUnitOfWork unitOfWork)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _userStore = userStore;
-            _emailStore = GetEmailStore();
-            _signInManager = signInManager;
-            _logger = logger;
-            _emailSender = emailSender;
+            this._userManager = userManager;
+            this._roleManager = roleManager;
+            this._userStore = userStore;
+            this._emailStore = GetEmailStore();
+            this._signInManager = signInManager;
+            this._logger = logger;
+            this._emailSender = emailSender;
+            this._unitOfWork = unitOfWork;
         }
 
         /// <summary>
@@ -132,6 +136,11 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
 
             [ValidateNever]
             public IEnumerable<SelectListItem> RoleList { get; set; }
+
+            public int? CompanyId { get; set; }
+
+            [ValidateNever]
+            public IEnumerable<SelectListItem> CompanyList { get; set; }
         }
 
 
@@ -145,12 +154,19 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
                 this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Company)).GetAwaiter().GetResult();
             }
 
+            var companies = await this._unitOfWork.Companies.GetAll();
+
             this.Input = new()
             {
                 RoleList = this._roleManager.Roles.Select(x => x.Name).Select(r => new SelectListItem
                 {
                     Text = r,
                     Value = r
+                }),
+                CompanyList = companies.Select(c => new SelectListItem()
+                {
+                    Text = c.Name,
+                    Value = c.Id.ToString()
                 })
             };
 
