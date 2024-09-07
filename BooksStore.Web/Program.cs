@@ -31,7 +31,8 @@ namespace BooksStore.Web
             });
 
             builder.Services.AddIdentity<IdentityUser, IdentityRole>
-                (options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<BooksStoreDbContext>();
+                (options => options.SignIn.RequireConfirmedAccount = false).AddEntityFrameworkStores<BooksStoreDbContext>()
+                .AddDefaultTokenProviders();
 
             builder.Services.AddHttpLogging(logging =>
             {
