@@ -33,5 +33,19 @@ namespace BooksStore.Models.DTOs
         [Required(ErrorMessage = "Phone number is required.")]
         [StringLength(10, ErrorMessage = "Phone number must be 10 characters.")]
         public string? PhoneNumber { get; set; }
+
+        public Company ToCompany()
+        {
+            return new Company()
+            {
+                Id = this.Id,
+                Name = this.Name,
+                StreetAddress = this.StreetAddress,
+                City = this.City,
+                State = this.State,
+                PostalCode = this.PostalCode,
+                PhoneNumber = this.PhoneNumber
+            };
+        }
     }
 }

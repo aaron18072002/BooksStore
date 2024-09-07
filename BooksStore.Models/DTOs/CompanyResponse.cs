@@ -29,4 +29,33 @@ namespace BooksStore.Models.DTOs
         [DisplayName("Phone Number")]
         public string? PhoneNumber { get; set; }
     }
+    public static class CompanyExtensions
+    {
+        public static CompanyResponse ToCompanyResponse(this Company company)
+        {
+            return new CompanyResponse()
+            {
+                Id = company.Id,
+                Name = company.Name,
+                StreetAddress = company.StreetAddress,
+                City = company.City,
+                State = company.State,
+                PostalCode = company.PostalCode,
+                PhoneNumber = company.PhoneNumber
+            };
+        }
+        public static CompanyUpdateRequest ToCompanyUpdateRequest(this Company company)
+        {
+            return new CompanyUpdateRequest()
+            {
+                Id = company.Id,
+                Name = company.Name,
+                StreetAddress = company.StreetAddress,
+                City = company.City,
+                State = company.State,
+                PostalCode = company.PostalCode,
+                PhoneNumber = company.PhoneNumber
+            };
+        }
+    }
 }

@@ -10,6 +10,7 @@ namespace BooksStore.DataAccess.Repositories.IRepositories
     {
         ICategoryRepository Categories { get; }
         IProductRepository Products { get; }
+        ICompanyRepository Companies { get; }
         Task Save();
     }
 }
