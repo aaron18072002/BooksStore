@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using BooksStore.DataAccess.Repositories.IRepositories;
+using BooksStore.Models.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace BooksStore.Web.Areas.Customer.Controllers
 {
@@ -6,10 +9,12 @@ namespace BooksStore.Web.Areas.Customer.Controllers
     [Route("[area]/[controller]")]
     public class CartController : Controller
     {
-        private ILogger<CartController> _logger;
-        public CartController(ILogger<CartController> logger)
+        private readonly ILogger<CartController> _logger;
+        private readonly IUnitOfWork _unitOfWork;
+        public CartController(ILogger<CartController> logger, IUnitOfWork unitOfWork)
         {
             this._logger = logger;
+            this._unitOfWork = unitOfWork;
         }
 
         [HttpGet]
@@ -19,7 +24,19 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(CartController), nameof(this.Index));
 
-            return View();
+            var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
+                (s => s.ApplicationUserId == userId, includeProperties: "Product");
+
+            var shoppingCartVM = new ShoppingCartVM()
+            {
+                ShoppingCarts = shoppingCartsList,
+                
+            };
+
+            return View(shoppingCartVM);
         }
     }
 }
