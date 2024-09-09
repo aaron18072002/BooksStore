@@ -15,6 +15,7 @@ namespace BooksStore.DataAccess.Repositories
         public IProductRepository Products { get; private set; }
         public ICompanyRepository Companies { get; private set; }
         public IShoppingCartRepository ShoppingCarts { get; private set; }
+        public IApplicationUserRepository ApplicationUsers { get; private set; }
         public UnitOfWork(BooksStoreDbContext db)
         {
             this._db = db;
@@ -22,6 +23,7 @@ namespace BooksStore.DataAccess.Repositories
             this.Products = new ProductRepository(db);
             this.Companies = new CompanyRepository(db);
             this.ShoppingCarts = new ShoppingCartRepository(db);
+            this.ApplicationUsers = new ApplicationUserRepository(db);
         }
 
         public async Task Save()
