@@ -13,6 +13,8 @@ namespace BooksStore.DataAccess.Repositories.IRepositories
         ICompanyRepository Companies { get; }
         IApplicationUserRepository ApplicationUsers { get; }
         IShoppingCartRepository ShoppingCarts { get; }
+        IOrderHeaderRepository OrderHeaders { get; }
+        IOrderDetailRepository OrderDetails { get; }
         Task Save();
     }
 }
