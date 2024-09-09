@@ -119,5 +119,29 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
             return this.RedirectToAction("Index", "Cart");
         }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Remove([FromQuery] int? cartId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(CartController), nameof(this.Minus));
+
+            if (cartId == null)
+            {
+                return this.NotFound();
+            }
+            var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
+                (s => s.Id == cartId);
+            if (shoppingCart == null)
+            {
+                return this.NotFound();
+            }
+
+            await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
+            await this._unitOfWork.Save();
+
+            return this.RedirectToAction("Index", "Cart");
+        }
     }
 }
