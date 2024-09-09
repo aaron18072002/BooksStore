@@ -29,7 +29,7 @@ namespace BooksStore.Models
 		public DateTime ShippingDate { get; set; }
 
 		[Required(ErrorMessage = "Order total is required.")]
-		public decimal OrderTotal { get; set; }
+		public decimal? OrderTotal { get; set; }
 
 		public string? OrderStatus { get; set; }
 		public string? PaymentStatus { get; set; }

@@ -6,152 +6,155 @@ using System.Security.Claims;
 
 namespace BooksStore.Web.Areas.Customer.Controllers
 {
-    [Area("Customer")]
-    [Route("[area]/[controller]")]
-    public class CartController : Controller
-    {
-        private readonly ILogger<CartController> _logger;
-        private readonly IUnitOfWork _unitOfWork;
-        public CartController(ILogger<CartController> logger, IUnitOfWork unitOfWork)
-        {
-            this._logger = logger;
-            this._unitOfWork = unitOfWork;
-        }
+	[Area("Customer")]
+	[Route("[area]/[controller]")]
+	public class CartController : Controller
+	{
+		private readonly ILogger<CartController> _logger;
+		private readonly IUnitOfWork _unitOfWork;
+		public CartController(ILogger<CartController> logger, IUnitOfWork unitOfWork)
+		{
+			this._logger = logger;
+			this._unitOfWork = unitOfWork;
+		}
 
-        private decimal? GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
-        {
-            if(shoppingCart.Count <= 50)
-            {
-                return shoppingCart?.Product?.Price;
-            }
-            else
-            {
-                if(shoppingCart.Count <= 100)
-                {
-                    return shoppingCart?.Product?.Price50;
-                }
-                return shoppingCart?.Product?.Price100;
-            }
-        }
+		private decimal? GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
+		{
+			if (shoppingCart.Count <= 50)
+			{
+				return shoppingCart?.Product?.Price;
+			}
+			else
+			{
+				if (shoppingCart.Count <= 100)
+				{
+					return shoppingCart?.Product?.Price50;
+				}
+				return shoppingCart?.Product?.Price100;
+			}
+		}
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> Index()
-        {
-            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
-                nameof(CartController), nameof(this.Index));
+		[HttpGet]
+		[Route("[action]")]
+		public async Task<IActionResult> Index()
+		{
+			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+				nameof(CartController), nameof(this.Index));
 
-            var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
-            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+			var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+			var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
-                (s => s.ApplicationUserId == userId, includeProperties: "Product");
+			var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
+				(s => s.ApplicationUserId == userId, includeProperties: "Product");
 
-            var shoppingCartVM = new ShoppingCartVM();
+			var shoppingCartVM = new ShoppingCartVM()
+			{
+				OrderHeader = new()
+			};
 
-            shoppingCartVM.TotalPrice = 0;
+			shoppingCartVM.OrderHeader.OrderTotal = 0;
 
-            foreach (var shoppingCart in shoppingCartsList)
-            {
-                var price = this.GetPriceBasedOnQuantity(shoppingCart);
-                shoppingCart.Price = price;
-                shoppingCartVM.TotalPrice += price * shoppingCart.Count;
-            }
+			foreach (var shoppingCart in shoppingCartsList)
+			{
+				var price = this.GetPriceBasedOnQuantity(shoppingCart);
+				shoppingCart.Price = price;
+				shoppingCartVM.OrderHeader.OrderTotal += price * shoppingCart.Count;
+			}
 
-            shoppingCartVM.ShoppingCarts = shoppingCartsList;
+			shoppingCartVM.ShoppingCarts = shoppingCartsList;
 
-            return View(shoppingCartVM);
-        }
+			return View(shoppingCartVM);
+		}
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> Summary()
-        {
+		[HttpGet]
+		[Route("[action]")]
+		public async Task<IActionResult> Summary()
+		{
 			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
 				nameof(CartController), nameof(this.Summary));
 
 			return View();
-        }
+		}
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> Plus([FromQuery]int? cartId)
-        {
-            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
-                nameof(CartController), nameof(this.Plus));
+		[HttpGet]
+		[Route("[action]")]
+		public async Task<IActionResult> Plus([FromQuery] int? cartId)
+		{
+			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+				nameof(CartController), nameof(this.Plus));
 
-            if (cartId == null)
-            {
-                return this.NotFound();
-            }
-            var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
-                (s => s.Id == cartId);
-            if (shoppingCart == null)
-            {
-                return this.NotFound();
-            }
+			if (cartId == null)
+			{
+				return this.NotFound();
+			}
+			var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
+				(s => s.Id == cartId);
+			if (shoppingCart == null)
+			{
+				return this.NotFound();
+			}
 
-            shoppingCart.Count += 1;
-            await this._unitOfWork.ShoppingCarts.Update(shoppingCart);
-            await this._unitOfWork.Save();
+			shoppingCart.Count += 1;
+			await this._unitOfWork.ShoppingCarts.Update(shoppingCart);
+			await this._unitOfWork.Save();
 
-            return this.RedirectToAction("Index", "Cart");
-        }
+			return this.RedirectToAction("Index", "Cart");
+		}
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> Minus([FromQuery] int? cartId)
-        {
-            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
-                nameof(CartController), nameof(this.Minus));
+		[HttpGet]
+		[Route("[action]")]
+		public async Task<IActionResult> Minus([FromQuery] int? cartId)
+		{
+			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+				nameof(CartController), nameof(this.Minus));
 
-            if (cartId == null)
-            {
-                return this.NotFound();
-            }
-            var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
-                (s => s.Id == cartId);
-            if (shoppingCart == null)
-            {
-                return this.NotFound();
-            }
+			if (cartId == null)
+			{
+				return this.NotFound();
+			}
+			var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
+				(s => s.Id == cartId);
+			if (shoppingCart == null)
+			{
+				return this.NotFound();
+			}
 
-            if(shoppingCart.Count <= 1)
-            {
-                await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);  
-            }
-            else
-            {
-                shoppingCart.Count -= 1;
-                await this._unitOfWork.ShoppingCarts.Update(shoppingCart);
-                await this._unitOfWork.Save();
-            } 
+			if (shoppingCart.Count <= 1)
+			{
+				await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
+			}
+			else
+			{
+				shoppingCart.Count -= 1;
+				await this._unitOfWork.ShoppingCarts.Update(shoppingCart);
+				await this._unitOfWork.Save();
+			}
 
-            return this.RedirectToAction("Index", "Cart");
-        }
+			return this.RedirectToAction("Index", "Cart");
+		}
 
-        [HttpGet]
-        [Route("[action]")]
-        public async Task<IActionResult> Remove([FromQuery] int? cartId)
-        {
-            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
-                nameof(CartController), nameof(this.Remove));
+		[HttpGet]
+		[Route("[action]")]
+		public async Task<IActionResult> Remove([FromQuery] int? cartId)
+		{
+			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+				nameof(CartController), nameof(this.Remove));
 
-            if (cartId == null)
-            {
-                return this.NotFound();
-            }
-            var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
-                (s => s.Id == cartId);
-            if (shoppingCart == null)
-            {
-                return this.NotFound();
-            }
+			if (cartId == null)
+			{
+				return this.NotFound();
+			}
+			var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
+				(s => s.Id == cartId);
+			if (shoppingCart == null)
+			{
+				return this.NotFound();
+			}
 
-            await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
-            await this._unitOfWork.Save();
+			await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
+			await this._unitOfWork.Save();
 
-            return this.RedirectToAction("Index", "Cart");
-        }
-    }
+			return this.RedirectToAction("Index", "Cart");
+		}
+	}
 }
