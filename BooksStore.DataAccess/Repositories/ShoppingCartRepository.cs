@@ -15,9 +15,10 @@ namespace BooksStore.DataAccess.Repositories
         {
         }
 
-        public Task Update(ShoppingCart shoppingCart)
+        public async Task Update(ShoppingCart shoppingCart)
         {
-            throw new NotImplementedException();
+            this.DbSet.Update(shoppingCart);
+            await this._db.SaveChangesAsync();
         }
     }
 }
