@@ -65,6 +65,16 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
         [HttpGet]
         [Route("[action]")]
+        public async Task<IActionResult> Summary()
+        {
+			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+				nameof(CartController), nameof(this.Summary));
+
+			return View();
+        }
+
+        [HttpGet]
+        [Route("[action]")]
         public async Task<IActionResult> Plus([FromQuery]int? cartId)
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
@@ -125,7 +135,7 @@ namespace BooksStore.Web.Areas.Customer.Controllers
         public async Task<IActionResult> Remove([FromQuery] int? cartId)
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
-                nameof(CartController), nameof(this.Minus));
+                nameof(CartController), nameof(this.Remove));
 
             if (cartId == null)
             {
