@@ -85,7 +85,19 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
             shoppingCart.ApplicationUserId = userId;
 
-            await this._unitOfWork.ShoppingCarts.Add(shoppingCart);
+            var shoppingCartFromDb = await this._unitOfWork.ShoppingCarts.GetDetails
+                (s => s.ApplicationUserId == userId && s.ProductId == shoppingCart.ProductId);
+
+            if(shoppingCartFromDb != null)
+            {
+                shoppingCartFromDb.Count += shoppingCart.Count;
+                await this._unitOfWork.ShoppingCarts.Update(shoppingCartFromDb);
+            }
+            else
+            {
+                await this._unitOfWork.ShoppingCarts.Add(shoppingCart);
+            }
+
             await this._unitOfWork.Save();
 
             return this.RedirectToAction($"{nameof(this.Index)}", "Home");
