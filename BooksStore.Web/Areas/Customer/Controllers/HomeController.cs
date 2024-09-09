@@ -63,9 +63,14 @@ namespace BooksStore.Web.Areas.Customer.Controllers
                 return this.NotFound();
             }
 
-            var productResponse = this.ConvertProductToProductResponse(product);
+            var shoppingCart = new ShoppingCart()
+            {
+                Count = 1,
+                Product = product,
+                ProductId = (int)productId
+            };
 
-            return this.View(productResponse);
+            return this.View(shoppingCart);
         }
 
         [HttpGet]
