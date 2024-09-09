@@ -14,12 +14,14 @@ namespace BooksStore.DataAccess.Repositories
         public ICategoryRepository Categories { get; private set; }
         public IProductRepository Products { get; private set; }
         public ICompanyRepository Companies { get; private set; }
+        public IShoppingCartRepository ShoppingCarts { get; private set; }
         public UnitOfWork(BooksStoreDbContext db)
         {
             this._db = db;
             this.Categories = new CategoryRepository(db);
             this.Products = new ProductRepository(db);
             this.Companies = new CompanyRepository(db);
+            this.ShoppingCarts = new ShoppingCartRepository(db);
         }
 
         public async Task Save()
