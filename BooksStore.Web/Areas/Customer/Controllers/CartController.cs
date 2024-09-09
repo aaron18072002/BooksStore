@@ -47,20 +47,77 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
                 (s => s.ApplicationUserId == userId, includeProperties: "Product");
 
-            var shoppingCartVM = new ShoppingCartVM()
-            {
-                ShoppingCarts = shoppingCartsList,              
-            };
+            var shoppingCartVM = new ShoppingCartVM();
 
             shoppingCartVM.TotalPrice = 0;
 
             foreach (var shoppingCart in shoppingCartsList)
             {
                 var price = this.GetPriceBasedOnQuantity(shoppingCart);
+                shoppingCart.Price = price;
                 shoppingCartVM.TotalPrice += price * shoppingCart.Count;
             }
 
+            shoppingCartVM.ShoppingCarts = shoppingCartsList;
+
             return View(shoppingCartVM);
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Plus([FromQuery]int? cartId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(CartController), nameof(this.Plus));
+
+            if (cartId == null)
+            {
+                return this.NotFound();
+            }
+            var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
+                (s => s.Id == cartId);
+            if (shoppingCart == null)
+            {
+                return this.NotFound();
+            }
+
+            shoppingCart.Count += 1;
+            await this._unitOfWork.ShoppingCarts.Update(shoppingCart);
+            await this._unitOfWork.Save();
+
+            return this.RedirectToAction("Index", "Cart");
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> Minus([FromQuery] int? cartId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(CartController), nameof(this.Minus));
+
+            if (cartId == null)
+            {
+                return this.NotFound();
+            }
+            var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
+                (s => s.Id == cartId);
+            if (shoppingCart == null)
+            {
+                return this.NotFound();
+            }
+
+            if(shoppingCart.Count <= 1)
+            {
+                await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);  
+            }
+            else
+            {
+                shoppingCart.Count -= 1;
+                await this._unitOfWork.ShoppingCarts.Update(shoppingCart);
+                await this._unitOfWork.Save();
+            } 
+
+            return this.RedirectToAction("Index", "Cart");
         }
     }
 }
