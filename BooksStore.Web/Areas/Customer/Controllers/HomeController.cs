@@ -2,8 +2,10 @@ using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
 using BooksStore.Models.DTOs;
 using BooksStore.Web.Areas.Admin.Controllers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace BooksStore.Web.Areas.Customer.Controllers
 {
@@ -71,6 +73,22 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             };
 
             return this.View(shoppingCart);
+        }
+
+        [HttpPost]
+        [Authorize]
+        [Route("[action]")]
+        public async Task<IActionResult> ProductDetails([FromForm]ShoppingCart shoppingCart)
+        {
+            var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+            var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            shoppingCart.ApplicationUserId = userId;
+
+            await this._unitOfWork.ShoppingCarts.Add(shoppingCart);
+            await this._unitOfWork.Save();
+
+            return this.RedirectToAction($"{nameof(this.Index)}", "Home");
         }
 
         [HttpGet]
