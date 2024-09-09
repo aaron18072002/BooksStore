@@ -47,9 +47,18 @@ namespace BooksStore.DataAccess.Repositories
         }
 
         public async Task<T?> GetDetails
-            (Expression<Func<T, bool>> filter, string? includeProperties = null)
+            (Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false)
         {
-            IQueryable<T> result = this.DbSet;
+            IQueryable<T> result;
+            if(tracked)
+            {
+                result = this.DbSet;
+            }
+            else
+            {
+                result = this.DbSet.AsNoTracking();
+            }
+
             result = result.Where(filter);
 
             if (!string.IsNullOrEmpty(includeProperties))

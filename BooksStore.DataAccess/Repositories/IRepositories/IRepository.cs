@@ -11,7 +11,7 @@ namespace BooksStore.DataAccess.Repositories.IRepositories
     {
         Task<IEnumerable<T>> GetAll(string? includeProperties = null);
 
-        Task<T?> GetDetails(Expression<Func<T, bool>> filter, string? includeProperties = null);
+        Task<T?> GetDetails(Expression<Func<T, bool>> filter, string? includeProperties = null, bool tracked = false);
 
         Task<T> Add(T entity);
 
