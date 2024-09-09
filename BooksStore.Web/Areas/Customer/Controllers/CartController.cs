@@ -1,4 +1,5 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
+using BooksStore.Models;
 using BooksStore.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -17,6 +18,22 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             this._unitOfWork = unitOfWork;
         }
 
+        private decimal? GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
+        {
+            if(shoppingCart.Count <= 50)
+            {
+                return shoppingCart?.Product?.Price;
+            }
+            else
+            {
+                if(shoppingCart.Count <= 100)
+                {
+                    return shoppingCart?.Product?.Price50;
+                }
+                return shoppingCart?.Product?.Price100;
+            }
+        }
+
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> Index()
@@ -32,9 +49,16 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
             var shoppingCartVM = new ShoppingCartVM()
             {
-                ShoppingCarts = shoppingCartsList,
-                
+                ShoppingCarts = shoppingCartsList,              
             };
+
+            shoppingCartVM.TotalPrice = 0;
+
+            foreach (var shoppingCart in shoppingCartsList)
+            {
+                var price = this.GetPriceBasedOnQuantity(shoppingCart);
+                shoppingCartVM.TotalPrice += price * shoppingCart.Count;
+            }
 
             return View(shoppingCartVM);
         }
