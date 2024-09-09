@@ -30,9 +30,13 @@ namespace BooksStore.DataAccess.Repositories
             return entity;
         }
 
-        public async Task<IEnumerable<T>> GetAll(string? includeProperties = null)
+        public async Task<IEnumerable<T>> GetAll(Expression<Func<T, bool>>? filter = null, string? includeProperties = null)
         {
             IQueryable<T> result = this.DbSet;
+            if(filter != null)
+            {
+                result = result.Where(filter);
+            }
 
             if (!string.IsNullOrEmpty(includeProperties))
             {
