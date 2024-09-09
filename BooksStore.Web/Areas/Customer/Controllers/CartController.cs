@@ -73,7 +73,38 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 			this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
 				nameof(CartController), nameof(this.Summary));
 
-			return View();
+			var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+			var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
+				(s => s.ApplicationUserId == userId, includeProperties: "Product");
+
+			var shoppingCartVM = new ShoppingCartVM()
+			{
+				OrderHeader = new()
+			};
+
+			shoppingCartVM.OrderHeader.ApplicationUser = await this._unitOfWork.ApplicationUsers
+				.GetDetails(u => u.Id == userId);
+			shoppingCartVM.OrderHeader.Name = shoppingCartVM?.OrderHeader?.ApplicationUser?.Name;
+			shoppingCartVM.OrderHeader.PhoneNumber = shoppingCartVM?.OrderHeader?.ApplicationUser?.PhoneNumber;
+			shoppingCartVM.OrderHeader.StreetAddress = shoppingCartVM?.OrderHeader?.ApplicationUser?.StreetAddress;
+			shoppingCartVM.OrderHeader.City = shoppingCartVM?.OrderHeader?.ApplicationUser?.City;
+			shoppingCartVM.OrderHeader.State = shoppingCartVM?.OrderHeader?.ApplicationUser?.State;
+			shoppingCartVM.OrderHeader.PostalCode = shoppingCartVM?.OrderHeader?.ApplicationUser?.PostalCode;
+
+			shoppingCartVM.OrderHeader.OrderTotal = 0;
+
+			foreach (var shoppingCart in shoppingCartsList)
+			{
+				var price = this.GetPriceBasedOnQuantity(shoppingCart);
+				shoppingCart.Price = price;
+				shoppingCartVM.OrderHeader.OrderTotal += price * shoppingCart.Count;
+			}
+
+			shoppingCartVM.ShoppingCarts = shoppingCartsList;
+
+			return View(shoppingCartVM);
 		}
 
 		[HttpGet]
