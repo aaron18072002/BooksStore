@@ -134,13 +134,18 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 				shoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
 				shoppingCartVM.OrderHeader.ApplicationUserId = userId;
 
+				var applicationUser = await this._unitOfWork.ApplicationUsers.GetDetails
+					(u => u.Id == userId, includeProperties: "Company");
+
+				shoppingCartVM.OrderHeader.OrderTotal = 0;
+
 				foreach (var cart in shoppingCartVM.ShoppingCarts)
 				{
 					cart.Price = this.GetPriceBasedOnQuantity(cart);
 					shoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
 				}
 
-				if (shoppingCartVM.OrderHeader.ApplicationUser?.CompanyId.GetValueOrDefault() == 0)
+				if (applicationUser?.CompanyId.GetValueOrDefault() == 0)
 				{
 					//it is a regular customer account and we need to capture payment
 					shoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
@@ -171,7 +176,22 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 				}
 			}
 
-			return View(shoppingCartVM);
+			return this.RedirectToAction("OrderConfirmation", "Cart", new
+			{
+				id = shoppingCartVM?.OrderHeader?.Id
+			});
+		}
+
+		[HttpGet]
+		[Route("[action]")]
+		public IActionResult OrderConfirmation([FromQuery] int? id)
+		{
+			if(id == null)
+			{
+				return this.NotFound();
+			}
+
+			return View(id);
 		}
 
 		[HttpGet]
