@@ -1,12 +1,14 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
 using BooksStore.Models.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace BooksStore.Web.Areas.Customer.Controllers
 {
 	[Area("Customer")]
+	[Authorize]
 	[Route("[area]/[controller]")]
 	public class CartController : Controller
 	{
@@ -84,16 +86,22 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 				OrderHeader = new()
 			};
 
-			shoppingCartVM.OrderHeader.ApplicationUser = await this._unitOfWork.ApplicationUsers
-				.GetDetails(u => u.Id == userId);
-			shoppingCartVM.OrderHeader.Name = shoppingCartVM?.OrderHeader?.ApplicationUser?.Name;
-			shoppingCartVM.OrderHeader.PhoneNumber = shoppingCartVM?.OrderHeader?.ApplicationUser?.PhoneNumber;
-			shoppingCartVM.OrderHeader.StreetAddress = shoppingCartVM?.OrderHeader?.ApplicationUser?.StreetAddress;
-			shoppingCartVM.OrderHeader.City = shoppingCartVM?.OrderHeader?.ApplicationUser?.City;
-			shoppingCartVM.OrderHeader.State = shoppingCartVM?.OrderHeader?.ApplicationUser?.State;
-			shoppingCartVM.OrderHeader.PostalCode = shoppingCartVM?.OrderHeader?.ApplicationUser?.PostalCode;
+			var applicationUser = await this._unitOfWork.ApplicationUsers
+				.GetDetails(u => u.Id == userId, includeProperties: "Company");
 
-			shoppingCartVM.OrderHeader.OrderTotal = 0;
+			if (applicationUser != null)
+			{
+				shoppingCartVM.OrderHeader.ApplicationUser = applicationUser;
+				shoppingCartVM.OrderHeader.Name = applicationUser.Name;
+				shoppingCartVM.OrderHeader.PhoneNumber = applicationUser.PhoneNumber;
+				shoppingCartVM.OrderHeader.StreetAddress = applicationUser.StreetAddress;
+				shoppingCartVM.OrderHeader.City = applicationUser.City;
+				shoppingCartVM.OrderHeader.State = applicationUser.State;
+				shoppingCartVM.OrderHeader.PostalCode = applicationUser.PostalCode;
+
+				shoppingCartVM.OrderHeader.OrderTotal = 0;
+			}
+
 
 			foreach (var shoppingCart in shoppingCartsList)
 			{
