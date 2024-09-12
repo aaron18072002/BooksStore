@@ -10,5 +10,7 @@ namespace BooksStore.DataAccess.Repositories.IRepositories
 	public interface IOrderHeaderRepository : IRepository<OrderHeader>
 	{
 		Task Update(OrderHeader orderHeader);
-	}
+
+        Task Update(int id, string orderStatus, string? paymentStatus = null);
+    }
 }

@@ -1,6 +1,7 @@
 ﻿using BooksStore.DataAccess.Database;
 using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,19 @@ namespace BooksStore.DataAccess.Repositories
 		{
 			throw new NotImplementedException();
 		}
-	}
+
+        public async Task Update(int id, string orderStatus, string? paymentStatus = null)
+        {
+			var orderHeader = await base._db.OrderHeaders.FirstOrDefaultAsync
+				(o => o.Id == id);
+			if (orderHeader != null)
+			{
+				orderHeader.OrderStatus = orderStatus;
+				if (!string.IsNullOrEmpty(paymentStatus))
+				{
+					orderHeader.PaymentStatus = paymentStatus;
+				}
+			}
+        }
+    }
 }
