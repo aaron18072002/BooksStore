@@ -200,11 +200,22 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
 		[HttpGet]
 		[Route("[action]")]
-		public IActionResult OrderConfirmation([FromQuery] int? id)
+		public async Task<IActionResult> OrderConfirmation([FromQuery] int? id)
 		{
 			if(id == null)
 			{
 				return this.NotFound();
+			}
+
+			var orderHeader = await this._unitOfWork.OrderHeaders.GetDetails
+				(o => o.Id == id, includeProperties: "ApplicationUser");
+
+			if(orderHeader != null)
+			{
+				var shoppingCarts = await this._unitOfWork.ShoppingCarts.GetAll
+					(s => s.ApplicationUserId == orderHeader.ApplicationUserId);
+				await this._unitOfWork.ShoppingCarts.RemoveRange(shoppingCarts);
+				await this._unitOfWork.Save();
 			}
 
 			return View(id);
