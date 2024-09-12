@@ -28,6 +28,12 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-area="Customer" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
+                        @if (User.IsInRole(StaticDetails.Role_Admin) || User.IsInRole(StaticDetails.Role_Employee))
+                        {                      
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="Admin" asp-controller="Order" asp-action="Index">Manager Order</a>
+                            </li>
+                        }
                         @if (User.IsInRole(StaticDetails.Role_Admin))
                         {
                             <li class="nav-item dropdown">
