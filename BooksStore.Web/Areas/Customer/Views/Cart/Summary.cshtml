@@ -111,6 +111,7 @@
 								<select asp-for="OrderHeader.PaymentType" asp-items="@ViewBag.PaymentList" class="form-select">
 									<option disabled selected>-Select Payment Type-</option>
 								</select>
+								<span asp-validation-for="OrderHeader.PaymentType" class="text-danger"></span>
 							</div>
 						</div>
 					</div>
@@ -132,3 +133,9 @@
 		</div>
 	</div>
 </form>
+
+@section Scripts {
+	@{
+		<partial name="_ValidationScriptsPartial" />
+	}
+}
