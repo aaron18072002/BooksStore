@@ -174,6 +174,11 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 					shoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusApproved;
 				}
 
+				shoppingCartVM.OrderHeader.OrderDate = DateTime.Now;
+				shoppingCartVM.OrderHeader.ShippingDate = DateTime.Now.AddDays(7);
+				shoppingCartVM.OrderHeader.PaymentDate = DateTime.Now;
+				shoppingCartVM.OrderHeader.PaymentDueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(4));
+
 				await this._unitOfWork.OrderHeaders.Add(shoppingCartVM.OrderHeader);
 				await this._unitOfWork.Save();
 
