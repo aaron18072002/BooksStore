@@ -13,6 +13,32 @@
         </div>
     </div>
     <div class="card-body p-4">
+        <div class="d-flex justify-content-between pb-5 pt-2">
+            <span></span>
+            <ul class="list-group list-group-horizontal-sm">
+                <a style="text-decoration:none; color: white; background-color: #007bff; border-radius: 0.25rem; padding: 0.5rem 1rem; display: inline-block; margin: 0 0.5rem;"
+                   asp-controller="Order" asp-action="Index" asp-route-status="inprocess">
+                    In Process
+                </a>
+                <a style="text-decoration:none; color: white; background-color: #ffc107; border-radius: 0.25rem; padding: 0.5rem 1rem; display: inline-block; margin: 0 0.5rem;"
+                   asp-controller="Order" asp-action="Index" asp-route-status="pending">
+                    Payment Pending
+                </a>
+                <a style="text-decoration:none; color: white; background-color: #28a745; border-radius: 0.25rem; padding: 0.5rem 1rem; display: inline-block; margin: 0 0.5rem;"
+                   asp-controller="Order" asp-action="Index" asp-route-status="completed">
+                    Completed
+                </a>
+                <a style="text-decoration:none; color: white; background-color: #17a2b8; border-radius: 0.25rem; padding: 0.5rem 1rem; display: inline-block; margin: 0 0.5rem;"
+                   asp-controller="Order" asp-action="Index" asp-route-status="approved">
+                    Approved
+                </a>
+                <a style="text-decoration:none; color: white; background-color: #6c757d; border-radius: 0.25rem; padding: 0.5rem 1rem; display: inline-block; margin: 0 0.5rem;"
+                   asp-controller="Order" asp-action="Index" asp-route-status="all">
+                    All
+                </a>
+            </ul>
+        </div>
+
         <table id="tblData" class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <th>ID</th>
