@@ -33,6 +33,10 @@ namespace BooksStore.Models
 
 		public string? OrderStatus { get; set; }
 		public string? PaymentStatus { get; set; }
+
+		[MaxLength(45, ErrorMessage = "User ID cannot exceed 45 characters.")]
+		public string? PaymentType { get; set; }
+
 		public string? TrackingNumber { get; set; }
 		public string? Carrier { get; set; }
 
