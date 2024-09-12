@@ -1,6 +1,7 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
 using BooksStore.Models.ViewModels;
+using BooksStore.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
@@ -111,6 +112,64 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 			}
 
 			shoppingCartVM.ShoppingCarts = shoppingCartsList;
+
+			return View(shoppingCartVM);
+		}
+
+		[HttpPost]
+		[Route("[action]")]
+		public async Task<IActionResult> SummaryPOST([FromForm] ShoppingCartVM shoppingCartVM)
+		{
+			this._logger.LogInformation("{ControllerName}.{MethodName} action post method",
+				nameof(CartController), nameof(this.SummaryPOST));
+
+			var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+			var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+			shoppingCartVM.ShoppingCarts = await this._unitOfWork.ShoppingCarts.GetAll
+				(s => s.ApplicationUserId == userId, includeProperties: "Product");
+
+			if (shoppingCartVM.OrderHeader != null)
+			{
+				shoppingCartVM.OrderHeader.OrderDate = System.DateTime.Now;
+				shoppingCartVM.OrderHeader.ApplicationUserId = userId;
+
+				foreach (var cart in shoppingCartVM.ShoppingCarts)
+				{
+					cart.Price = this.GetPriceBasedOnQuantity(cart);
+					shoppingCartVM.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+				}
+
+				if (shoppingCartVM.OrderHeader.ApplicationUser?.CompanyId.GetValueOrDefault() == 0)
+				{
+					//it is a regular customer account and we need to capture payment
+					shoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusPending;
+					shoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusPending;
+				}
+				else
+				{
+					//it is a company user
+					shoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusDelayedPayment;
+					shoppingCartVM.OrderHeader.OrderStatus = StaticDetails.StatusApproved;
+				}
+
+				await this._unitOfWork.OrderHeaders.Add(shoppingCartVM.OrderHeader);
+				await this._unitOfWork.Save();
+
+				foreach (var cart in shoppingCartVM.ShoppingCarts)
+				{
+					OrderDetail orderDetail = new()
+					{
+						ProductId = cart.ProductId,
+						OrderHeaderId = shoppingCartVM.OrderHeader.Id,
+						Price = (decimal)cart.Price,
+						Count = cart.Count
+					};
+
+					await this._unitOfWork.OrderDetails.Add(orderDetail);
+					await this._unitOfWork.Save();
+				}
+			}
 
 			return View(shoppingCartVM);
 		}
