@@ -25,5 +25,8 @@ namespace BooksStore.Utilities
 		public const string PaymentStatusApproved = "Approved";
 		public const string PaymentStatusDelayedPayment = "ApprovedForDelayedPayment";
 		public const string PaymentStatusRejected = "Rejected";
-	}
+
+        public const string PaymentCreditCard = "Credit Card";
+        public const string PaymentCash = "Cash";
+    }
 }
