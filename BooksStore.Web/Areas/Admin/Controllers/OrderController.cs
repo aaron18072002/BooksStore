@@ -1,4 +1,5 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
+using BooksStore.Models.ViewModels;
 using BooksStore.Utilities;
 using BooksStore.Web.Areas.Customer.Controllers;
 using Microsoft.AspNetCore.Authorization;
@@ -26,8 +27,34 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 			return View();
 		}
 
-		#region API Calls
-		[HttpGet]
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> OrderDetails([FromQuery]int? orderId)
+        {
+            if(!orderId.HasValue)
+            {
+                return this.NotFound();
+            }
+            var orderHeader = await this._unitOfWork.OrderHeaders.GetDetails
+                (oh => oh.Id == orderId, includeProperties: "ApplicationUser");
+            if(orderHeader == null)
+            {
+                return this.NotFound();
+            }
+            var listOfOrderDetails = await this._unitOfWork.OrderDetails.GetAll
+                (od => od.OrderHeaderId == orderHeader.Id);
+
+            var orderVM = new OrderVM()
+            {
+                OrderHeader = orderHeader,
+                OrderDetails = listOfOrderDetails
+            };
+
+            return View(orderVM);
+        }
+
+        #region API Calls
+        [HttpGet]
 		[Route("[action]")]
 		public async Task<IActionResult> GetAllOrders([FromQuery]string? status)
 		{
