@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace BooksStore.Web.Areas.Admin.Controllers
 {
 	[Area("Admin")]
-	//[Authorize(Roles = $"{StaticDetails.Role_Admin},{StaticDetails.Role_Employee}")]
+    //[Authorize(Roles = $"{StaticDetails.Role_Admin},{StaticDetails.Role_Employee}")]
+    [Authorize]
 	[Route("[area]/[controller]")]
 	public class OrderController : Controller
 	{
