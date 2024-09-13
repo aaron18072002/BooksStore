@@ -7,6 +7,7 @@
 @{
     var status = Context.Request.Query["status"];
     var pending = "text-primary";
+    var delayed = "text-primary";
     var inprocess = "text-primary";
     var completed = "text-primary";
     var approved = "text-primary";
@@ -16,6 +17,9 @@
     {
         case "pending":
             pending = "active text-white bg-primary";
+            break;
+        case "delayed":
+            delayed = "active text-white bg-primary";
             break;
         case "inprocess":
             inprocess = "active text-white bg-primary";
@@ -49,6 +53,9 @@
                 </a>
                 <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="pending">
                     <li class="list-group-item @pending">Payment Pending</li>
+                </a>
+                <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="delayed">
+                <li class="list-group-item @delayed">Payment Delayed</li>
                 </a>
                 <a style="text-decoration:none;" asp-controller="Order" asp-action="Index" asp-route-status="completed">
                     <li class="list-group-item @completed">Completed</li>

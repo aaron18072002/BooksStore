@@ -29,13 +29,34 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 		#region API Calls
 		[HttpGet]
 		[Route("[action]")]
-		public async Task<IActionResult> GetAllOrders()
+		public async Task<IActionResult> GetAllOrders([FromQuery]string? status)
 		{
 			this._logger.LogInformation("{ControllerName}.{MethodName} action API get method",
 				nameof(OrderController), nameof(this.GetAllOrders));
 
 			var orderHeaders = await this._unitOfWork.OrderHeaders.GetAll
 				(includeProperties: "ApplicationUser");
+
+			switch(status)
+			{
+                case "pending":
+                    orderHeaders = orderHeaders.Where(o => o.PaymentStatus == StaticDetails.PaymentStatusPending);
+                    break;
+                case "delayed":
+                    orderHeaders = orderHeaders.Where(o => o.PaymentStatus == StaticDetails.PaymentStatusDelayedPayment);
+                    break;
+                case "inprocess":
+                    orderHeaders = orderHeaders.Where(o => o.OrderStatus == StaticDetails.StatusInProcess);
+                    break;
+                case "completed":
+                    orderHeaders = orderHeaders.Where(o => o.OrderStatus == StaticDetails.StatusShipped);
+                    break;
+                case "approved":
+                    orderHeaders = orderHeaders.Where(o => o.OrderStatus == StaticDetails.StatusApproved);
+                    break;
+                default:
+                    break;
+            }
 
             return this.Json(new
             {
