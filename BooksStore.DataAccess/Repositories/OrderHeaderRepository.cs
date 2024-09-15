@@ -22,7 +22,7 @@ namespace BooksStore.DataAccess.Repositories
 			await this._db.SaveChangesAsync();
 		}
 
-        public async Task Update(int id, string orderStatus, string? paymentStatus = null)
+        public async Task UpdateStatus(int id, string orderStatus, string? paymentStatus = null)
         {
 			var orderHeader = await base._db.OrderHeaders.FirstOrDefaultAsync
 				(o => o.Id == id);

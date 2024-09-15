@@ -11,6 +11,6 @@ namespace BooksStore.DataAccess.Repositories.IRepositories
 	{
 		Task Update(OrderHeader orderHeader);
 
-        Task Update(int id, string orderStatus, string? paymentStatus = null);
+        Task UpdateStatus(int id, string orderStatus, string? paymentStatus = null);
     }
 }
