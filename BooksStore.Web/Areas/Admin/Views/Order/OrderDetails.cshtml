@@ -5,6 +5,7 @@
 }
 
 <form method="post">
+    <input asp-for="OrderHeader.Id" hidden />
     <br />
     <div class="container">
         <div class="card">
@@ -189,8 +190,11 @@
                                 </div>
                             </div>
                             @if (User.IsInRole(StaticDetails.Role_Admin) || User.IsInRole(StaticDetails.Role_Employee))
-                            {                              
-                                <input type="submit" class="btn btn-warning form-control my-1" value="Update Order Details" />
+                            {
+                                <button asp-area="Admin" asp-controller="Order" asp-action="UpdateOrderDetails"
+                                        type="submit" class="btn btn-warning form-control my-1">
+                                    Update Order Details
+                                </button>
                             }
 
                         </div>
@@ -201,8 +205,8 @@
                             <label class="btn btn-outline-primary form-control my-2">Order Status - @Model.OrderHeader.OrderStatus</label>
 
                             <ul class="list-group mb-3">
-                                @foreach(var detail in Model.OrderDetails)
-                                {                              
+                                @foreach (var detail in Model.OrderDetails)
+                                {
                                     <li class="list-group-item d-flex justify-content-between p-2">
                                         <div class="row container">
                                             <div class="col-8">
