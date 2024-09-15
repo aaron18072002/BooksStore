@@ -16,9 +16,10 @@ namespace BooksStore.DataAccess.Repositories
 		{
 
 		}
-		public Task Update(OrderHeader orderHeader)
+		public async Task Update(OrderHeader orderHeader)
 		{
-			throw new NotImplementedException();
+			this.DbSet.Update(orderHeader);
+			await this._db.SaveChangesAsync();
 		}
 
         public async Task Update(int id, string orderStatus, string? paymentStatus = null)
