@@ -1,10 +1,12 @@
 ﻿using BooksStore.DataAccess.Repositories.IRepositories;
+using BooksStore.Models;
 using BooksStore.Models.ViewModels;
 using BooksStore.Utilities;
 using BooksStore.Web.Areas.Customer.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
+using System.Security.Claims;
 
 namespace BooksStore.Web.Areas.Admin.Controllers
 {
@@ -100,8 +102,20 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 			this._logger.LogInformation("{ControllerName}.{MethodName} action API get method",
 				nameof(OrderController), nameof(this.GetAllOrders));
 
-			var orderHeaders = await this._unitOfWork.OrderHeaders.GetAll
-				(includeProperties: "ApplicationUser");
+            IEnumerable<OrderHeader> orderHeaders;
+
+            if (this.User.IsInRole(StaticDetails.Role_Admin) || this.User.IsInRole(StaticDetails.Role_Employee))
+            {
+			    orderHeaders = await this._unitOfWork.OrderHeaders.GetAll
+				    (includeProperties: "ApplicationUser");
+            } else
+            {
+                var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+                var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+                orderHeaders = await this._unitOfWork.OrderHeaders.GetAll
+                    (o => o.ApplicationUserId == userId, includeProperties: "ApplicationUser");
+            }
 
 			switch(status)
 			{
