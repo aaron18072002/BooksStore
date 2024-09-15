@@ -4,6 +4,7 @@ using BooksStore.Utilities;
 using BooksStore.Web.Areas.Customer.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.Blazor;
 
 namespace BooksStore.Web.Areas.Admin.Controllers
 {
@@ -52,6 +53,43 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             };
 
             return View(orderVM);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = StaticDetails.Role_Employee + "," + StaticDetails.Role_Admin)]
+        [Route("[action]")]
+        public async Task<IActionResult> UpdateOrderDetails([FromForm]OrderVM orderVM)
+        {
+            if(orderVM == null || orderVM.OrderHeader == null)
+            {
+                return this.NotFound();
+            }
+            var orderHeaderFromDb = await this._unitOfWork.OrderHeaders.GetDetails
+                (o => o.Id == orderVM.OrderHeader.Id);
+            if(orderHeaderFromDb != null)
+            {
+                orderHeaderFromDb.Name = orderVM.OrderHeader.Name;
+                orderHeaderFromDb.PhoneNumber = orderVM.OrderHeader.PhoneNumber;
+                orderHeaderFromDb.StreetAddress = orderVM.OrderHeader.StreetAddress;
+                orderHeaderFromDb.City = orderVM.OrderHeader.City;
+                orderHeaderFromDb.State = orderVM.OrderHeader.State;
+                orderHeaderFromDb.PostalCode = orderVM.OrderHeader.PostalCode;
+                if (!string.IsNullOrEmpty(orderVM.OrderHeader.Carrier))
+                {
+                    orderHeaderFromDb.Carrier = orderVM.OrderHeader.Carrier;
+                }
+                if (!string.IsNullOrEmpty(orderVM.OrderHeader.TrackingNumber))
+                {
+                    orderHeaderFromDb.TrackingNumber = orderVM.OrderHeader.TrackingNumber;
+                }
+
+                await this._unitOfWork.OrderHeaders.Update(orderHeaderFromDb);
+                await this._unitOfWork.Save();
+            }
+
+            TempData["Success"] = "Order Details Updated Successfully.";
+
+            return this.RedirectToAction(nameof(OrderDetails), new { orderId = orderHeaderFromDb?.Id });
         }
 
         #region API Calls
