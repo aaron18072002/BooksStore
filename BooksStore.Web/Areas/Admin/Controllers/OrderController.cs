@@ -28,14 +28,20 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 		[Route("[action]")]
 		public IActionResult Index()
 		{
-			return View();
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(OrderController), nameof(this.Index));
+
+            return View();
 		}
 
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> OrderDetails([FromQuery]int? orderId)
         {
-            if(!orderId.HasValue)
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(OrderController), nameof(this.OrderDetails));
+
+            if (!orderId.HasValue)
             {
                 return this.NotFound();
             }
@@ -62,7 +68,10 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> UpdateOrderDetails([FromForm]OrderVM orderVM)
         {
-            if(orderVM == null || orderVM.OrderHeader == null)
+            this._logger.LogInformation("{ControllerName}.{MethodName} action POST method",
+                nameof(OrderController), nameof(this.UpdateOrderDetails));
+
+            if (orderVM == null || orderVM.OrderHeader == null)
             {
                 return this.NotFound();
             }
@@ -92,6 +101,60 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             TempData["Success"] = "Order Details Updated Successfully.";
 
             return this.RedirectToAction(nameof(OrderDetails), new { orderId = orderHeaderFromDb?.Id });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = StaticDetails.Role_Employee + "," + StaticDetails.Role_Admin)]
+        [Route("[action]")]
+        public async Task<IActionResult> StartProcessing([FromForm] OrderVM orderVM)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action POST method",
+                nameof(OrderController), nameof(this.StartProcessing));
+
+            if (orderVM == null || orderVM.OrderHeader == null)
+            {
+                return this.NotFound();
+            }
+            await this._unitOfWork.OrderHeaders.UpdateStatus
+                (orderVM.OrderHeader.Id, StaticDetails.StatusInProcess);
+            await this._unitOfWork.Save();
+
+            TempData["Success"] = "Order Processing Successfully.";
+
+            return this.RedirectToAction(nameof(OrderDetails), new { orderId = orderVM.OrderHeader?.Id });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = StaticDetails.Role_Employee + "," + StaticDetails.Role_Admin)]
+        [Route("[action]")]
+        public async Task<IActionResult> ShipOrder([FromForm] OrderVM orderVM)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action POST method",
+               nameof(OrderController), nameof(this.ShipOrder));
+
+            if (orderVM == null || orderVM.OrderHeader == null)
+            {
+                return this.NotFound();
+            }
+
+            var orderHeader = await _unitOfWork.OrderHeaders.GetDetails
+                (u => u.Id == orderVM.OrderHeader.Id);
+            if (orderHeader != null)
+            {               
+                orderHeader.TrackingNumber = orderVM.OrderHeader.TrackingNumber;
+                orderHeader.Carrier = orderVM.OrderHeader.Carrier;
+                orderHeader.OrderStatus = StaticDetails.StatusShipped;
+                orderHeader.ShippingDate = DateTime.Now;
+                if (orderHeader.PaymentStatus == StaticDetails.PaymentStatusDelayedPayment)
+                {
+                    orderHeader.PaymentDueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(30));
+                }
+
+                await this._unitOfWork.OrderHeaders.Update(orderHeader);
+                await this._unitOfWork.Save();
+                TempData["Success"] = "Order Shipped Successfully.";
+            }
+            return RedirectToAction(nameof(OrderDetails), new { orderId = orderVM.OrderHeader?.Id });
         }
 
         #region API Calls
