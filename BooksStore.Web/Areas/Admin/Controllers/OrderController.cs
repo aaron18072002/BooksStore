@@ -157,6 +157,36 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             return RedirectToAction(nameof(OrderDetails), new { orderId = orderVM.OrderHeader?.Id });
         }
 
+        [HttpPost]
+        [Authorize(Roles = StaticDetails.Role_Employee + "," + StaticDetails.Role_Admin)]
+        [Route("[action]")]
+        public async Task<IActionResult> CancelOrder([FromForm] OrderVM orderVM)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action POST method",
+               nameof(OrderController), nameof(this.ShipOrder));
+
+            if (orderVM == null || orderVM.OrderHeader == null)
+            {
+                return this.NotFound();
+            }
+
+            var orderHeader = await _unitOfWork.OrderHeaders.GetDetails
+                (u => u.Id == orderVM.OrderHeader.Id);
+            if (orderHeader != null)
+            {
+                await this._unitOfWork.OrderHeaders.UpdateStatus
+                    (orderHeader.Id, StaticDetails.StatusCancelled, StaticDetails.PaymentStatusRejected);
+
+                //orderVM.OrderHeader.OrderStatus = StaticDetails.StatusCancelled;
+                //orderVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatusRejected;
+
+                //await this._unitOfWork.OrderHeaders.Update(orderHeader);
+                await this._unitOfWork.Save();
+                TempData["Success"] = "Order Canceled Successfully.";
+            }
+            return RedirectToAction(nameof(OrderDetails), new { orderId = orderVM.OrderHeader?.Id });
+        }
+
         #region API Calls
         [HttpGet]
 		[Route("[action]")]

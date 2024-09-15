@@ -260,10 +260,11 @@
                                 }
                                 @if (Model.OrderHeader.OrderStatus != StaticDetails.StatusRefunded
                                     && Model.OrderHeader.OrderStatus != StaticDetails.StatusCancelled
-                                    && Model.OrderHeader.OrderStatus != StaticDetails.StatusShipped
+                                    @* && Model.OrderHeader.OrderStatus != StaticDetails.StatusShipped *@
                                 )
                                 {
-                                    <button type="submit" class="btn btn-danger form-control my-1">
+                                    <button asp-area="Admin" asp-controller="Order" asp-action="CancelOrder"
+                                            type="submit" class="btn btn-danger form-control my-1">
                                         Cancel Order
                                     </button>
                                 }
