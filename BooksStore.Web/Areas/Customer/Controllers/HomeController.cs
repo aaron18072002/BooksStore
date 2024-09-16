@@ -39,6 +39,24 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(HomeController), nameof(this.Index));
 
+            var claimsIdentity = (ClaimsIdentity?)this.User.Identity;
+            var claim = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier);
+            if (claim == null)
+            {
+                this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, 0);
+            } else
+            {
+                var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var shoppingCartsCount = await this._unitOfWork.ShoppingCarts.GetAll
+                    (s => s.ApplicationUserId == userId);
+                int count = 0;
+                foreach (var item in shoppingCartsCount)
+                {
+                    count++;
+                }
+                this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, count);
+            }
+
             var products = await this._unitOfWork.Products.GetAll(includeProperties: "Category"); 
 
             var productsResponse = products.Select(p => this.ConvertProductToProductResponse(p)).ToList();

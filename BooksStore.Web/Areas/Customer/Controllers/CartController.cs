@@ -271,7 +271,18 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
 			if (shoppingCart.Count <= 1)
 			{
-				await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
+                var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
+                (s => s.ApplicationUserId == shoppingCart.ApplicationUserId);
+                int count = 0;
+                foreach (var item in shoppingCartsList)
+                {
+                    count++;
+                }
+
+                this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, count - 1);
+
+                await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
+				await this._unitOfWork.Save();
 			}
 			else
 			{
@@ -301,7 +312,17 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 				return this.NotFound();
 			}
 
-			await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
+			var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
+				(s => s.ApplicationUserId == shoppingCart.ApplicationUserId);
+			int count = 0;
+            foreach (var item in shoppingCartsList)
+            {
+				count++;
+            }
+
+            this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, count - 1);
+
+            await this._unitOfWork.ShoppingCarts.Remove(shoppingCart);
 			await this._unitOfWork.Save();
 
 			return this.RedirectToAction("Index", "Cart");
