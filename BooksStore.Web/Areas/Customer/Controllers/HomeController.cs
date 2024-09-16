@@ -1,6 +1,7 @@
 using BooksStore.DataAccess.Repositories.IRepositories;
 using BooksStore.Models;
 using BooksStore.Models.DTOs;
+using BooksStore.Utilities;
 using BooksStore.Web.Areas.Admin.Controllers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -92,10 +93,21 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             {
                 shoppingCartFromDb.Count += shoppingCart.Count;
                 await this._unitOfWork.ShoppingCarts.Update(shoppingCartFromDb);
+                await this._unitOfWork.Save();
             }
             else
             {
                 await this._unitOfWork.ShoppingCarts.Add(shoppingCart);
+                await this._unitOfWork.Save();
+
+                var shoppingCartsCount = await this._unitOfWork.ShoppingCarts.GetAll
+                    (s => s.ApplicationUserId == userId);
+                int count = 0;
+                foreach (var item in shoppingCartsCount)
+                {
+                    count++;
+                }
+                this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, count);
             }
 
             await this._unitOfWork.Save();
