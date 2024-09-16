@@ -17,6 +17,14 @@ namespace BooksStore.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDistributedMemoryCache();
+            builder.Services.AddSession(options => {
+                options.IdleTimeout = TimeSpan.FromMinutes(100);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
             builder.Services.AddRazorPages();
 
             builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -76,6 +84,8 @@ namespace BooksStore.Web
 
             app.UseAuthentication();
             app.UseAuthorization();
+
+            app.UseSession();
 
             app.MapRazorPages();
             app.MapControllerRoute(
