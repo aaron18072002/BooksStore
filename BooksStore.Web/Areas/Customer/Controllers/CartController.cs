@@ -263,7 +263,7 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 				return this.NotFound();
 			}
 			var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
-				(s => s.Id == cartId);
+				(s => s.Id == cartId, tracked: true);
 			if (shoppingCart == null)
 			{
 				return this.NotFound();
@@ -272,7 +272,7 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 			if (shoppingCart.Count <= 1)
 			{
                 var shoppingCartsList = await this._unitOfWork.ShoppingCarts.GetAll
-                (s => s.ApplicationUserId == shoppingCart.ApplicationUserId);
+					(s => s.ApplicationUserId == shoppingCart.ApplicationUserId);
                 int count = 0;
                 foreach (var item in shoppingCartsList)
                 {
@@ -306,7 +306,7 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 				return this.NotFound();
 			}
 			var shoppingCart = await this._unitOfWork.ShoppingCarts.GetDetails
-				(s => s.Id == cartId);
+				(s => s.Id == cartId, tracked: true);
 			if (shoppingCart == null)
 			{
 				return this.NotFound();
