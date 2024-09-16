@@ -146,13 +146,13 @@ namespace BooksStore.Web.Areas.Identity.Pages.Account
 
         public async Task OnGetAsync(string returnUrl = null)
         {
-            if (!this._roleManager.RoleExistsAsync(StaticDetails.Role_Customer).GetAwaiter().GetResult())
-            {
-                this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Customer)).GetAwaiter().GetResult();
-                this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Employee)).GetAwaiter().GetResult();
-                this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Admin)).GetAwaiter().GetResult();
-                this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Company)).GetAwaiter().GetResult();
-            }
+            //if (!this._roleManager.RoleExistsAsync(StaticDetails.Role_Customer).GetAwaiter().GetResult())
+            //{
+            //    this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Customer)).GetAwaiter().GetResult();
+            //    this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Employee)).GetAwaiter().GetResult();
+            //    this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Admin)).GetAwaiter().GetResult();
+            //    this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Company)).GetAwaiter().GetResult();
+            //}
 
             var companies = await this._unitOfWork.Companies.GetAll();
 
