@@ -47,14 +47,11 @@ namespace BooksStore.Web.Areas.Customer.Controllers
             } else
             {
                 var userId = claimsIdentity?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var shoppingCartsCount = await this._unitOfWork.ShoppingCarts.GetAll
+                var shoppingCarts = await this._unitOfWork.ShoppingCarts.GetAll
                     (s => s.ApplicationUserId == userId);
-                int count = 0;
-                foreach (var item in shoppingCartsCount)
-                {
-                    count++;
-                }
-                this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, count);
+                
+                this.HttpContext.Session.SetInt32(StaticDetails.SessionCart, 
+                    ShoppingOrdersHelping.GetTotalOrders(shoppingCarts));
             }
 
             var products = await this._unitOfWork.Products.GetAll(includeProperties: "Category"); 
