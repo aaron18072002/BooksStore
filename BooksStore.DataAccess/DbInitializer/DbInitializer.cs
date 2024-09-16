@@ -23,7 +23,7 @@ namespace BooksStore.DataAccess.DbInitializer
             this._db = db;
         }
 
-        public async Task Initialize()
+        public void Initialize()
         {
             //migrations if they are not applied
             try
@@ -43,27 +43,60 @@ namespace BooksStore.DataAccess.DbInitializer
                 this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Admin)).GetAwaiter().GetResult();
                 this._roleManager.CreateAsync(new IdentityRole(StaticDetails.Role_Company)).GetAwaiter().GetResult();
 
-                //if roles are not created, then we will create admin user as well
-                await this._userManager.CreateAsync(new ApplicationUser
-                {
-                    UserName = "admin1",
-                    Email = "admin1@gmail.com",
-                    Name = "Nguyễn Thanh Anh",
-                    PhoneNumber = "0906413506",
-                    StreetAddress = "54 Hải Hồ",
-                    State = "Hải Châu",
-                    PostalCode = "23422",
-                    City = "Đà Nẵng"
-                }, "@Nguyenthanhanh123");
-
-                var user = await this._db.ApplicationUsers.FirstOrDefaultAsync
-                    (u => u.Email == "admin1@gmail.com");
-
-                if (user != null)
-                {                   
-                    await this._userManager.AddToRoleAsync(user, StaticDetails.Role_Admin);
-                }
             }
+
+            //if roles are not created, then we will create admin user as well
+            //this._userManager.CreateAsync(new ApplicationUser
+            //{
+            //    UserName = "admin4",
+            //    Email = "admin4@gmail.com",
+            //    Name = "Nguyễn Thanh Admin4",
+            //    PhoneNumber = "0906413506",
+            //    StreetAddress = "54 Hải Hồ",
+            //    State = "Hải Châu",
+            //    PostalCode = "23422",
+            //    City = "Đà Nẵng",
+            //}, password: "@Nguyenthanhanh123").GetAwaiter().GetResult();
+
+            //var user = this._db.ApplicationUsers.FirstOrDefaultAsync
+            //    (u => u.Email == "admin4@gmail.com").GetAwaiter().GetResult();
+
+            //if (user != null)
+            //{
+            //    var result = _userManager.ChangePasswordAsync
+            //        (user, "@Nguyenthanhanh123", "@Nguyenthanhanh123").GetAwaiter().GetResult();
+
+            //    if (result.Succeeded)
+            //    {
+            //        Console.WriteLine("Password changed successfully.");
+            //    }
+            //    else
+            //    {
+            //        foreach (var error in result.Errors)
+            //        {
+            //            Console.WriteLine($"Error: {error.Description}");
+            //        }
+            //    }
+            //    this._userManager.AddToRoleAsync(user, StaticDetails.Role_Admin).GetAwaiter().GetResult();
+            //}
+
+            _userManager.CreateAsync(new ApplicationUser
+            {
+                UserName = "admin@dotnetmastery.com",
+                Email = "admin@dotnetmastery.com",
+                Name = "Bhrugen Patel",
+                PhoneNumber = "1112223333",
+                StreetAddress = "test 123 Ave",
+                State = "IL",
+                PostalCode = "23422",
+                City = "Chicago"
+            }, "Admin123*").GetAwaiter().GetResult();
+
+
+            ApplicationUser user = _db.ApplicationUsers.FirstOrDefault
+                (u => u.Email == "admin@dotnetmastery.com");
+
+            _userManager.AddToRoleAsync(user, StaticDetails.Role_Admin).GetAwaiter().GetResult();
 
             return;
         }
