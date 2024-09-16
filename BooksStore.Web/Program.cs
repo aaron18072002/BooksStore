@@ -90,7 +90,7 @@ namespace BooksStore.Web
 
             app.UseSession();
 
-            SeedDatabase();
+            //SeedDatabase();
 
             app.MapRazorPages();
             app.MapControllerRoute(

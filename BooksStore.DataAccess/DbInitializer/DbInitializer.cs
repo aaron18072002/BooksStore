@@ -93,7 +93,7 @@ namespace BooksStore.DataAccess.DbInitializer
             }, "Admin123*").GetAwaiter().GetResult();
 
 
-            ApplicationUser user = _db.ApplicationUsers.FirstOrDefault
+            ApplicationUser? user = _db.ApplicationUsers.FirstOrDefault
                 (u => u.Email == "admin@dotnetmastery.com");
 
             _userManager.AddToRoleAsync(user, StaticDetails.Role_Admin).GetAwaiter().GetResult();
