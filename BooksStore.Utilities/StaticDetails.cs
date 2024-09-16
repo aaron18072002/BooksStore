@@ -28,5 +28,7 @@ namespace BooksStore.Utilities
 
         public const string PaymentCreditCard = "Credit Card";
         public const string PaymentCash = "Cash";
+
+        public const string SessionCart = "SessionShoppingCart";
     }
 }
