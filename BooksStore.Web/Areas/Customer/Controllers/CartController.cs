@@ -67,7 +67,13 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 
 			shoppingCartVM.ShoppingCarts = shoppingCartsList;
 
-			return View(shoppingCartVM);
+            if (this.HttpContext.Session.GetInt32(StaticDetails.SessionCart) == null ||
+                this.HttpContext.Session.GetInt32(StaticDetails.SessionCart) == 0)
+            {
+                ViewBag.DisableSummary = true;
+            }
+
+            return View(shoppingCartVM);
 		}
 
 		[HttpGet]
