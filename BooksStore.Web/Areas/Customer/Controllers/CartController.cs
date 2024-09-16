@@ -227,6 +227,8 @@ namespace BooksStore.Web.Areas.Customer.Controllers
 					(s => s.ApplicationUserId == orderHeader.ApplicationUserId);
 				await this._unitOfWork.ShoppingCarts.RemoveRange(shoppingCarts);
 				await this._unitOfWork.Save();
+
+				this.HttpContext.Session.Clear();
 			}
 
 			return View(id);
