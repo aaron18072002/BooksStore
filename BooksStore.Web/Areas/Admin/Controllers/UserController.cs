@@ -25,6 +25,9 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public IActionResult Index()
         {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(UserController), nameof(this.Index));
+
             return this.View();
         }
 
@@ -33,6 +36,9 @@ namespace BooksStore.Web.Areas.Admin.Controllers
         [Route("[action]")]
         public async Task<IActionResult> GetAllUsers()
         {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get API method",
+                nameof(UserController), nameof(this.GetAllUsers));
+
             var users = await this._db.ApplicationUsers
                 .Include(u => u.Company).ToListAsync();
 
@@ -62,6 +68,35 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             {
                 Data = users
             });
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> LockUser([FromQuery]string? id)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action POST API method",
+                nameof(UserController), nameof(this.LockUser));
+
+            var userFromDb = await this._db.ApplicationUsers.FirstOrDefaultAsync
+                (u => u.Id == id);
+            if (userFromDb == null)
+            {
+                return Json(new { success = false, message = "Error while Locking/Unlocking" });
+            }
+
+            if (userFromDb.LockoutEnd != null && userFromDb.LockoutEnd > DateTime.Now)
+            {
+                //user is currently locked and we need to unlock them
+                userFromDb.LockoutEnd = DateTime.Now;
+            }
+            else
+            {
+                userFromDb.LockoutEnd = DateTime.Now.AddYears(1000);
+            }
+
+            await this._db.SaveChangesAsync();
+
+            return this.Json(new { success = true, message = "Lock User Successful" });
         }
         #endregion
     }
