@@ -3,6 +3,7 @@ using BooksStore.Models;
 using BooksStore.Models.ViewModels;
 using BooksStore.Utilities;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +18,12 @@ namespace BooksStore.Web.Areas.Admin.Controllers
     {
         private readonly BooksStoreDbContext _db;
         private readonly ILogger<UserController> _logger;
-        public UserController(BooksStoreDbContext db, ILogger<UserController> logger)
+        private readonly UserManager<IdentityUser> _userManager;
+        public UserController(BooksStoreDbContext db, ILogger<UserController> logger, UserManager<IdentityUser> userManager)
         {
             this._db = db;
             this._logger = logger;
+            this._userManager = userManager;
         }
 
         [HttpGet]
@@ -35,7 +38,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> RoleManagement([FromQuery]string? userId)
+        public async Task<IActionResult> RoleManagement([FromQuery] string? userId)
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
                 nameof(UserController), nameof(this.RoleManagement));
@@ -72,6 +75,37 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             }
 
             return this.View(roleVM);
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public async Task<IActionResult> RoleManagement
+            ([FromForm] RoleManagementVM roleManagementVM)
+        {
+            var roleID = this._db.UserRoles.FirstOrDefault
+                (u => u.UserId == roleManagementVM.ApplicationUser.Id)?.RoleId;
+            var oldRole = _db.Roles.FirstOrDefault(u => u.Id == roleID)?.Name;
+
+            if (!(roleManagementVM.ApplicationUser?.Role == oldRole))
+            {
+                //a role was updated
+                var applicationUser = await this._db.ApplicationUsers.FirstOrDefaultAsync
+                    (u => u.Id == roleManagementVM.ApplicationUser.Id);
+                if (roleManagementVM.ApplicationUser.Role == StaticDetails.Role_Company)
+                {
+                    applicationUser.CompanyId = roleManagementVM.ApplicationUser.CompanyId;
+                }
+                if (oldRole == StaticDetails.Role_Company)
+                {
+                    applicationUser.CompanyId = null;
+                }
+                _db.SaveChanges();
+
+                _userManager.RemoveFromRoleAsync(applicationUser, oldRole).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(applicationUser, roleManagementVM.ApplicationUser.Role).GetAwaiter().GetResult();
+
+            }
+            return RedirectToAction("Index");
         }
 
         #region API calls
@@ -115,7 +149,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> LockUnlock([FromQuery]string? id)
+        public async Task<IActionResult> LockUnlock([FromQuery] string? id)
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action POST API method",
                 nameof(UserController), nameof(this.LockUnlock));
