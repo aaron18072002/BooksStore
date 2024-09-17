@@ -1,8 +1,10 @@
 ﻿using BooksStore.DataAccess.Database;
 using BooksStore.Models;
+using BooksStore.Models.ViewModels;
 using BooksStore.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 
 namespace BooksStore.Web.Areas.Admin.Controllers
@@ -29,6 +31,47 @@ namespace BooksStore.Web.Areas.Admin.Controllers
                 nameof(UserController), nameof(this.Index));
 
             return this.View();
+        }
+
+        [HttpGet]
+        [Route("[action]")]
+        public async Task<IActionResult> RoleManagement([FromQuery]string? userId)
+        {
+            this._logger.LogInformation("{ControllerName}.{MethodName} action get method",
+                nameof(UserController), nameof(this.RoleManagement));
+
+            if (userId == null)
+            {
+                return this.NotFound();
+            }
+
+            var role = await this._db.UserRoles.FirstOrDefaultAsync
+                (u => u.UserId == userId);
+            var roleId = role?.RoleId;
+
+            var roleVM = new RoleManagementVM()
+            {
+                ApplicationUser = await this._db.ApplicationUsers.Include(u => u.Company).FirstOrDefaultAsync
+                    (u => u.Id == userId),
+                RoleList = this._db.Roles.Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Name
+                }),
+                CompanyList = this._db.Companies.Select(i => new SelectListItem
+                {
+                    Text = i.Name,
+                    Value = i.Id.ToString()
+                }),
+            };
+
+            if (roleVM.ApplicationUser != null)
+            {
+                roleVM.ApplicationUser.Role = _db.Roles.FirstOrDefault
+                    (u => u.Id == roleId)?.Name;
+            }
+
+            return this.View(roleVM);
         }
 
         #region API calls
