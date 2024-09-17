@@ -35,6 +35,14 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             var users = await this._db.ApplicationUsers
                 .Include(u => u.Company).ToListAsync();
 
+            foreach (var user in users)
+            {
+                if(user.Company == null)
+                {
+                    user.Company.Name = string.Empty;
+                }
+            }
+
             return this.Json(new
             {
                 Data = users
