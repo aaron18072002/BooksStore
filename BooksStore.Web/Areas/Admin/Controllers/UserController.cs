@@ -72,10 +72,10 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
         [HttpPost]
         [Route("[action]")]
-        public async Task<IActionResult> LockUser([FromQuery]string? id)
+        public async Task<IActionResult> LockUnlock([FromQuery]string? id)
         {
             this._logger.LogInformation("{ControllerName}.{MethodName} action POST API method",
-                nameof(UserController), nameof(this.LockUser));
+                nameof(UserController), nameof(this.LockUnlock));
 
             var userFromDb = await this._db.ApplicationUsers.FirstOrDefaultAsync
                 (u => u.Id == id);
@@ -96,7 +96,7 @@ namespace BooksStore.Web.Areas.Admin.Controllers
 
             await this._db.SaveChangesAsync();
 
-            return this.Json(new { success = true, message = "Lock User Successful" });
+            return this.Json(new { success = true, message = "Lock/Unlock User Successful" });
         }
         #endregion
     }
