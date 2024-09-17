@@ -1,4 +1,5 @@
 ﻿using BooksStore.DataAccess.Database;
+using BooksStore.Models;
 using BooksStore.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,10 +36,24 @@ namespace BooksStore.Web.Areas.Admin.Controllers
             var users = await this._db.ApplicationUsers
                 .Include(u => u.Company).ToListAsync();
 
+            var usersRoles = await this._db.UserRoles.ToListAsync();
+            var roles = await this._db.Roles.ToListAsync();
+
             foreach (var user in users)
             {
-                if(user.Company == null)
+                var roleId = usersRoles.FirstOrDefault(u => u.UserId == user.Id)?.RoleId;
+                if (roleId == null)
                 {
+                    user.Role = "Didn't assign role yet";
+                }
+                else
+                {
+                    user.Role = roles.FirstOrDefault(r => r.Id == roleId)?.Name;
+                }
+
+                if (user.Company == null)
+                {
+                    user.Company = new Company();
                     user.Company.Name = string.Empty;
                 }
             }
